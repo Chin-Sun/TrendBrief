@@ -23,7 +23,7 @@ python3 <skill>/scripts/fetch_rank.py --out digest_data.json
 
 | 参数 | 用途 |
 |---|---|
-| `--reddit-json <path>` | 模式 B：读浏览器导出的 Reddit JSON |
+| `--reddit-json <path>` | 模式 B：读浏览器导出的 Reddit JSON；传 `.pdf` 则自动走打印版还原 |
 | `--hn-min-points N` | HN 候选门槛，默认 20 |
 | `--content-limit N` | 单条正文截断长度，默认 3000 |
 | `--no-content` | 跳过正文抓取，仅验证排名链路 |
@@ -57,6 +57,8 @@ python3 <skill>/scripts/render_html.py digest_data.json summaries.json \
 
 缺摘要的条目会在页面上显式标出并计入编者按 —— 脚本不会用任何自动文本填充。渲染后 `open digest_*.html` 给用户看。
 
+页面报头下有**频道过滤条**（全部 / 各信源），点击即按信源筛选，序号与头条随当前视图重排，空版块整块收起；未采集的信源渲染成禁用状态并在 `title` 里写明原因。链接加 `#ch=hn` 之类可直接落到指定频道。禁用 JavaScript 时频道条隐藏、全部条目照常显示。
+
 ## Reddit：三模式降级
 
 Reddit 是四个信源里唯一封锁免鉴权访问的（`.json` 返回反爬 HTML、RSS 返回 0 字节、公共镜像 403）。
@@ -74,7 +76,17 @@ Reddit 是四个信源里唯一封锁免鉴权访问的（`.json` 返回反爬 H
 - **模式 B · 浏览器导出**：让用户在已登录 Reddit 的浏览器中打开
   `https://www.reddit.com/r/LocalLLaMA/top.json?t=week&limit=100`，另存为文件，再用 `--reddit-json <path>` 传入。真实浏览器会话能绕过针对脚本的反爬。
 
-- **模式 C · 跳过**：无凭证也无导出文件时自动降级。Reddit 的名额按优先级顺位转给 HN，页面编者按显式说明「本期未采集」。**不要假装采到了。**
+  **推荐用户用「右键 → 存储为」或 DevTools Network 面板复制响应体**，直接得到 `.json`，`limit=100` 也能生效。
+
+- **模式 B-pdf · 打印版 PDF**：用户若把 JSON 页面打印成了 PDF，`--reddit-json` 传 `.pdf` 即可，`scripts/pdf_to_reddit_json.py` 会还原成 listing。也可单独跑：
+
+  ```bash
+  python3 <skill>/scripts/pdf_to_reddit_json.py top.pdf -o reddit.json
+  ```
+
+  已实测可用（10 条全部还原、核心字段无缺）。但要如实告诉用户两个限制：**打印时 `limit` 参数往往不生效，实测只得 10 条**，候选池比其他信源浅得多；标题末尾的 emoji 可能因无字形而丢失。字段缺失的条目会被丢弃并在 stderr 列出，**不静默补默认值**。
+
+- **模式 C · 跳过**：无凭证也无导出文件时自动降级。Reddit 的名额按优先级**轮转**分给其余信源，页面编者按显式说明「本期未采集」。**不要假装采到了。**
 
 ## 排名口径
 

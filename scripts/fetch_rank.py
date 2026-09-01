@@ -322,21 +322,31 @@ def parse_reddit_listing(payload):
 
 def fetch_reddit(export_path):
     """三模式降级：A 凭证 / B 浏览器导出 / C 跳过。"""
-    # 模式 B —— 用户从已登录浏览器导出的 JSON
+    # 模式 B —— 用户从已登录浏览器导出的 JSON，或该页面的打印版 PDF
     if export_path:
+        is_pdf = str(export_path).lower().endswith(".pdf")
+        note = "浏览器导出的 JSON"
         try:
-            with open(export_path, encoding="utf-8") as f:
-                payload = json.load(f)
+            if is_pdf:
+                from pdf_to_reddit_json import convert
+                payload, rep = convert(export_path)
+                note = (f"打印版 PDF 还原：解析 {rep['total']} 条，"
+                        f"核心字段完整 {rep['usable']} 条")
+                for d in rep["dropped"]:             # 丢弃的条目要说清楚，不静默
+                    log(f"Reddit  ✗ 丢弃 {d['title']}（缺 {d['missing']}）")
+            else:
+                with open(export_path, encoding="utf-8") as f:
+                    payload = json.load(f)
         except Exception as e:                       # noqa: BLE001
             return [], {"ok": False, "mode": "C",
-                        "reason": f"读取导出文件失败: {type(e).__name__}"}
+                        "reason": f"读取导出文件失败: {type(e).__name__}: {e}"}
         items = parse_reddit_listing(payload)
         if not items:
             return [], {"ok": False, "mode": "C",
                         "reason": "导出文件里没有解析到帖子（是否存成了 HTML？）"}
-        log(f"Reddit  候选 {len(items)} 条（模式 B：浏览器导出）")
-        return items, {"ok": True, "mode": "B", "candidates": len(items),
-                       "note": "浏览器导出的 JSON"}
+        mode = "B-pdf" if is_pdf else "B"
+        log(f"Reddit  候选 {len(items)} 条（模式 {mode}）")
+        return items, {"ok": True, "mode": mode, "candidates": len(items), "note": note}
 
     # 模式 A —— OAuth 凭证
     tok, err = reddit_token()
@@ -618,7 +628,7 @@ def cross_source_dedup(items):
 
 def select(pools, quota, used, allow_dupes):
     """pools: {source: [已按 score 降序的条目]}。返回 (选中列表, 缺额数)。"""
-    chosen, leftovers, shortfall = [], {}, 0
+    chosen, leftovers, shortfall, filled = [], {}, 0, {}
     for src in SOURCE_ORDER:
         q = quota.get(src, 0)
         cands = [it for it in pools.get(src, [])
@@ -629,22 +639,30 @@ def select(pools, quota, used, allow_dupes):
         shortfall += q - len(take)
         for it in take:
             used.add(it["key"])
-    # 顺位补位：空缺按 HN → Reddit → HF → dev.to 给下一家
-    for src in SOURCE_ORDER:
-        while shortfall > 0 and leftovers.get(src):
-            it = leftovers[src].pop(0)
-            if not allow_dupes and it["key"] in used:
-                continue
-            chosen.append(it)
-            used.add(it["key"])
-            shortfall -= 1
-        if shortfall == 0:
+    # 轮转补位：空缺按 HN → Reddit → HF → dev.to 轮流各补一席。
+    # 不按优先级让单源吃到饱 —— 那样某个信源缺席时，版面会被最高优先级的一家压满。
+    while shortfall > 0:
+        progressed = False
+        for src in SOURCE_ORDER:
+            if shortfall == 0:
+                break
+            while leftovers.get(src):
+                it = leftovers[src].pop(0)
+                if not allow_dupes and it["key"] in used:
+                    continue
+                chosen.append(it)
+                used.add(it["key"])
+                shortfall -= 1
+                filled[src] = filled.get(src, 0) + 1
+                progressed = True
+                break
+        if not progressed:                           # 所有源都空了，防死循环
             break
     # 展示顺序：先信源优先级，再组内得分。
     # 不做跨信源的分数排序 —— 不同平台的分位值不可比，那样排是伪精度。
     prio = {s: i for i, s in enumerate(SOURCE_ORDER)}
     chosen.sort(key=lambda x: (prio[x["source"]], -x["score"]))
-    return chosen, shortfall
+    return chosen, shortfall, filled
 
 
 # ---------------------------------------------------------------- 正文补齐
@@ -773,15 +791,17 @@ def main():
     # 按版块分配名额
     used, sections = set(), []
     for spec in SECTIONS:
-        chosen, shortfall = select(pools[spec["window"]], spec["quota"],
-                                   used, args.allow_cross_section_dupes)
+        chosen, shortfall, backfill = select(pools[spec["window"]], spec["quota"],
+                                             used, args.allow_cross_section_dupes)
         sections.append({**{k: spec[k] for k in ("id", "title", "kicker", "quota", "window")},
-                         "shortfall": shortfall, "items": chosen})
+                         "shortfall": shortfall, "backfill": backfill, "items": chosen})
         got = {}
         for it in chosen:
             got[it["source"]] = got.get(it["source"], 0) + 1
         log(f"{spec['title']}: {len(chosen)} 条 "
             + ("(" + ", ".join(f"{k}×{v}" for k, v in got.items()) + ")" if got else "")
+            + (" 轮转补位 " + ", ".join(f"{k}+{v}" for k, v in backfill.items())
+               if backfill else "")
             + (f" 缺额 {shortfall}" if shortfall else ""))
 
     # 只对入选条目抓正文

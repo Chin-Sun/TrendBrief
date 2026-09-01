@@ -58,6 +58,24 @@ a{color:inherit}
 .src-ok::before{content:"●";color:#2e7d4f;margin-right:6px;font-size:9px;vertical-align:2px}
 .src-off::before{content:"○";color:var(--muted);margin-right:6px;font-size:9px;vertical-align:2px}
 
+/* ---------- 频道切换 ---------- */
+.channels{display:flex;flex-wrap:wrap;gap:8px;padding:13px 0;
+  border-bottom:1px solid var(--rule)}
+.ch{font-family:var(--sans);font-size:11.5px;letter-spacing:.09em;text-transform:uppercase;
+  background:none;border:1px solid var(--rule);color:var(--muted);
+  padding:6px 13px;border-radius:2px;cursor:pointer;transition:none}
+.ch:hover:not(:disabled){border-color:var(--rule-strong);color:var(--ink)}
+.ch.on{background:var(--rule-strong);color:var(--paper);border-color:var(--rule-strong)}
+.ch:disabled{opacity:.45;cursor:not-allowed;text-decoration:line-through}
+.ch .c{font-family:var(--head);font-style:italic;text-transform:none;
+  letter-spacing:0;margin-left:5px}
+
+/* 频道过滤：body 无 data-ch（例如禁用 JS）时不匹配任何规则，全部条目照常显示 */
+body[data-ch="hn"]     .story:not([data-source="hn"]),
+body[data-ch="reddit"] .story:not([data-source="reddit"]),
+body[data-ch="hf"]     .story:not([data-source="hf"]),
+body[data-ch="devto"]  .story:not([data-source="devto"]){display:none}
+
 /* ---------- 版块 ---------- */
 section{margin-top:46px}
 .sec-head{display:flex;justify-content:space-between;align-items:baseline;gap:14px;
@@ -87,31 +105,37 @@ h3.hl,h2.hl{font-family:var(--head);font-weight:700;margin:0 0 9px;letter-spacin
 .links a:hover{border-bottom-color:var(--accent)}
 .also{font-family:var(--sans);font-size:11px;color:var(--muted);margin-top:7px}
 
-/* ---------- 头条 ---------- */
-.lead{padding:26px 0 24px;border-bottom:1px solid var(--rule)}
-.lead h2.hl{font-size:clamp(27px,4.1vw,43px);line-height:1.13;margin-bottom:12px}
-.lead .sum{font-size:16px;line-height:1.8;column-count:2;column-gap:36px;
-  column-rule:1px solid var(--rule)}
-
 /* ---------- 多栏网格 ---------- */
 .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:34px 0;padding-top:26px}
 .story{padding:0 26px;border-left:1px solid var(--rule)}
+.story h3.hl{font-size:19px;line-height:1.28}
+/* 无 JS 时的静态列位；有 JS 时由 data-col 覆盖（过滤后 nth-child 会错位） */
 .story:nth-child(3n+1){border-left:none;padding-left:0}
 .story:nth-child(3n){padding-right:0}
-.story h3.hl{font-size:19px;line-height:1.28}
+.story[data-col]{border-left:1px solid var(--rule);padding-left:26px;padding-right:26px}
+.story[data-col="0"]{border-left:none;padding-left:0}
+.story[data-col="last"]{padding-right:0}
+
+/* ---------- 头条：由 class 控制，过滤后可换人 ---------- */
+.story.is-lead{grid-column:1/-1;border-left:none!important;
+  padding:0 0 24px!important;border-bottom:1px solid var(--rule);margin-bottom:2px}
+.story.is-lead h3.hl{font-size:clamp(27px,4.1vw,43px);line-height:1.13;margin-bottom:12px}
+.story.is-lead .sum{font-size:16px;line-height:1.8;column-count:2;column-gap:36px;
+  column-rule:1px solid var(--rule)}
 @media (max-width:900px){
   .grid{grid-template-columns:repeat(2,1fr);gap:30px 0}
   .story:nth-child(3n+1){border-left:1px solid var(--rule);padding-left:26px}
   .story:nth-child(3n){padding-right:26px}
   .story:nth-child(2n+1){border-left:none;padding-left:0}
   .story:nth-child(2n){padding-right:0}
-  .lead .sum{column-count:1}
+  .story.is-lead .sum{column-count:1}
 }
 @media (max-width:620px){
   .wrap{padding:0 18px 56px}
   .grid{grid-template-columns:1fr;gap:0}
   .story{border-left:none!important;padding:22px 0!important;
          border-top:1px solid var(--rule)}
+  .story.is-lead{border-top:none;padding-top:4px!important}
   .story:first-child{border-top:none;padding-top:4px!important}
 }
 
@@ -126,7 +150,7 @@ footer code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12
 
 @media print{
   body{background:#fff;color:#000}
-  .links{display:none}
+  .links,.channels{display:none}
   section{break-inside:avoid}
   .story{break-inside:avoid}
 }
@@ -170,7 +194,6 @@ def meta_line(it, now):
 
 
 def render_item(it, idx, summaries, now, lead=False):
-    tag = "h2" if lead else "h3"
     sid = it.get("sid", "")
     summary = (summaries.get(sid) or "").strip()
     if summary:
@@ -191,13 +214,15 @@ def render_item(it, idx, summaries, now, lead=False):
         link_html = (f'<a href="{esc(it["target_url"])}" target="_blank" rel="noopener">'
                      f'阅读原文 →</a>' + link_html)
 
+    # 头条与常规条目共用一套结构 —— 频道过滤后头条要能换人，两套 HTML 做不到
     return f"""
-      <article class="{'lead' if lead else 'story'}">
+      <article class="story{' is-lead' if lead else ''}"
+               data-source="{esc(it['source'])}" data-sid="{esc(sid)}">
         <div class="kicker"><span class="n">{idx:02d}</span>
           <span class="s">{esc(it['source_label'])}</span>
           <span>{esc(cn_date(it['created_utc']))}</span></div>
-        <{tag} class="hl"><a href="{esc(it['permalink'])}" target="_blank"
-          rel="noopener">{esc(it['title'])}</a></{tag}>
+        <h3 class="hl"><a href="{esc(it['permalink'])}" target="_blank"
+          rel="noopener">{esc(it['title'])}</a></h3>
         <div class="meta">{meta_line(it, now)}</div>
         {sum_html}
         <div class="links">{link_html}</div>
@@ -207,20 +232,19 @@ def render_item(it, idx, summaries, now, lead=False):
 
 def render_section(sec, summaries, now):
     items = sec["items"]
+    sid = esc(sec.get("id", ""))
     if not items:
-        return (f'<section><div class="sec-head"><h2>{esc(sec["title"])}</h2>'
+        return (f'<section data-sec="{sid}"><div class="sec-head">'
+                f'<h2>{esc(sec["title"])}</h2>'
                 f'<span class="k">{esc(sec["kicker"])}</span></div>'
                 f'<p class="sum missing">本版块没有可用条目。</p></section>')
-    body = render_item(items[0], 1, summaries, now, lead=True)
-    if len(items) > 1:
-        cards = "".join(render_item(it, i, summaries, now)
-                        for i, it in enumerate(items[1:], start=2))
-        body += f'<div class="grid">{cards}</div>'
+    cards = "".join(render_item(it, i, summaries, now, lead=(i == 1))
+                    for i, it in enumerate(items, start=1))
     return f"""
-    <section>
+    <section data-sec="{sid}">
       <div class="sec-head"><h2>{esc(sec['title'])}</h2>
         <span class="k">{esc(sec['kicker'])}</span></div>
-      {body}
+      <div class="grid">{cards}</div>
     </section>"""
 
 
@@ -236,6 +260,73 @@ def render_sources(status):
             tail = "未采集：" + (st.get("reason") or "未知原因")
         bits.append(f'<span class="{cls}"><b>{esc(st.get("label", key))}</b> {esc(tail)}</span>')
     return "".join(bits)
+
+
+def render_channels(data):
+    """频道过滤条。计数在 Python 端算好；未采集的信源渲染成 disabled 并说明原因。"""
+    counts = {}
+    for sec in data["sections"]:
+        for it in sec["items"]:
+            counts[it["source"]] = counts.get(it["source"], 0) + 1
+    total = sum(counts.values())
+
+    bits = [f'<button class="ch on" data-ch="all" type="button">'
+            f'全部 <span class="c">{total}</span></button>']
+    for key, st in data["source_status"].items():
+        n = counts.get(key, 0)
+        label = esc(st.get("label", key))
+        if n:
+            bits.append(f'<button class="ch" data-ch="{esc(key)}" type="button">'
+                        f'{label} <span class="c">{n}</span></button>')
+        else:
+            why = st.get("reason") or "本期无入选条目"
+            bits.append(f'<button class="ch" data-ch="{esc(key)}" type="button" disabled '
+                        f'title="{esc(why)}">{label} <span class="c">0</span></button>')
+    return '<nav class="channels" role="tablist">' + "".join(bits) + "</nav>"
+
+
+CHANNEL_JS = """
+(function(){
+  var body=document.body, btns=[].slice.call(document.querySelectorAll('.ch'));
+  function cols(grid){
+    var t=getComputedStyle(grid).gridTemplateColumns;
+    return t ? t.split(' ').filter(Boolean).length : 1;
+  }
+  var cur='all';
+  function apply(ch){
+    cur=ch; body.setAttribute('data-ch', ch);
+    btns.forEach(function(b){b.classList.toggle('on', b.dataset.ch===ch)});
+    [].forEach.call(document.querySelectorAll('section[data-sec]'), function(s){
+      var grid=s.querySelector('.grid'), all=grid?[].slice.call(
+        grid.querySelectorAll('.story')):[];
+      var vis=all.filter(function(a){
+        return ch==='all' || a.getAttribute('data-source')===ch;});
+      s.hidden = vis.length===0;                       // 空版块整块收起，不留空壳标题
+      all.forEach(function(a){a.classList.remove('is-lead');a.removeAttribute('data-col')});
+      if(!vis.length) return;                          // 先清干净再返回，不留陈旧状态
+      var n=cols(grid);
+      vis.forEach(function(a,i){
+        // 序号与头条都跟着当前视图走；列位自己算，nth-child 在过滤后会错位
+        a.querySelector('.kicker .n').textContent=('0'+(i+1)).slice(-2);
+        if(i===0){a.classList.add('is-lead');return;}
+        var c=(i-1)%n;
+        a.setAttribute('data-col', c===0 ? '0' : (c===n-1 ? 'last' : String(c)));
+      });
+    });
+    try{history.replaceState(null,'','#ch='+ch)}catch(e){}
+  }
+  btns.forEach(function(b){
+    if(!b.disabled) b.addEventListener('click', function(){apply(b.dataset.ch)});
+  });
+  var t;
+  addEventListener('resize', function(){       // 断点变化会改列数，重排列位
+    clearTimeout(t); t=setTimeout(function(){apply(cur)}, 150);
+  });
+  var m=/[#&]ch=([a-z]+)/i.exec(location.hash), want=m && m[1].toLowerCase();
+  apply(want && document.querySelector('.ch[data-ch="'+want+'"]:not(:disabled)')
+        ? want : 'all');
+})();
+"""
 
 
 def render_footer(data, summaries, missing):
@@ -255,16 +346,32 @@ def render_footer(data, summaries, missing):
         "不做跨平台的分数比较。",
         "名额固定：七日要闻 HN 4 / Reddit 3 / HF 2 / dev.to 1，三日速览 2/1/1/1，"
         "另设 Hacker News 专属三日专栏 5 条。某信源不足额时，空缺按 "
-        "HN → Reddit → HF → dev.to 的优先级顺位补上。三个版块之间不重复选取同一条目。",
+        "HN → Reddit → HF → dev.to <strong>轮流各补一席</strong>，"
+        "而非让最高优先级的一家吃满 —— 否则某个信源缺席时版面会被单一平台压倒。"
+        "三个版块之间不重复选取同一条目。",
     ]
+
+    bf = [(s["title"], s["backfill"]) for s in data["sections"] if s.get("backfill")]
+    if bf:
+        notes.append("本期实际补位：" + "；".join(
+            f"<strong>{esc(t)}</strong> " + "、".join(f"{k} +{v}" for k, v in b.items())
+            for t, b in bf) + "。")
+
+    src_notes = [f"<strong>{esc(x['label'])}</strong>：{esc(x['note'])}"
+                 for x in st.values() if x.get("ok") and x.get("note")]
+    if src_notes:
+        notes.append("数据来源：" + "；".join(src_notes) + "。")
     if down:
         notes.append('<span class="note-warn">本期未采集：'
                      + "；".join(f"<strong>{esc(s['label'])}</strong>（{esc(s.get('reason', ''))}）"
                                  for s in down)
-                     + "。其名额已按优先级顺位转移，页面中不含该信源的任何条目。</span>")
+                     + "。其名额已轮转分给其余信源，页面中不含该信源的任何条目。</span>")
     if missing:
         notes.append(f'<span class="note-warn">有 {missing} 条目缺少中文摘要，'
                      "已在正文位置显式标出，未用任何自动文本填充。</span>")
+    notes.append("报头下的频道条可按信源筛选，序号与头条随所选频道重排；"
+                 "链接末尾的 <code>#ch=hn</code> 之类可直接落到指定频道。"
+                 "禁用 JavaScript 时频道条隐藏，全部条目照常显示。")
     notes.append(f"生成时间 {esc(gen)}　·　HN 候选门槛 <code>points &gt; "
                  f"{esc(cfg.get('hn_min_points', '?'))}</code>　·　"
                  "排名口径全文见 <code>references/ranking.md</code>")
@@ -312,10 +419,13 @@ def render(data, summaries, nameplate):
     <div class="tagline">四源技术热帖简报　·　排名依据平台原生计数</div>
     <div class="rule-double"></div>
     <div class="sources">{render_sources(data['source_status'])}</div>
+    {render_channels(data)}
   </header>
   {sections}
   {render_footer(data, summaries, missing)}
 </div>
+<noscript><style>.channels{{display:none}}</style></noscript>
+<script>{CHANNEL_JS}</script>
 </body>
 </html>"""
 
