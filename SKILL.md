@@ -59,6 +59,56 @@ python3 <skill>/scripts/render_html.py digest_data.json summaries.json \
 
 页面报头下有**频道过滤条**（全部 / 各信源），点击即按信源筛选，序号与头条随当前视图重排，空版块整块收起；未采集的信源渲染成禁用状态并在 `title` 里写明原因。链接加 `#ch=hn` 之类可直接落到指定频道。禁用 JavaScript 时频道条隐藏、全部条目照常显示。
 
+## 模式二 · 新闻板（🐮 The Daily Bull）
+
+与「日报」并列的第二种产出。**日报**是固定 20 条、三个时间版块、跨信源配额分配的一次性简报；
+**新闻板**是把近 N 天的榜单切成等量批次供反复翻阅，只收 HN 与 HF Papers，带星标收藏。
+用户说「每天的 Top30 / 更新按钮 / 收藏」时用这个，说「今天有什么值得看的」时用日报。
+
+```bash
+python3 <skill>/scripts/fetch_batches.py \
+    --out board_data.json --content-out board_content.json
+# 读 board_content.json，为前 2 批写 200 字中文摘要 → summaries.json
+python3 <skill>/scripts/render_board.py board_data.json summaries.json \
+    -o ~/Desktop/daily_bull.html
+```
+
+| 参数 | 用途 |
+|---|---|
+| `--window-days N` | 榜单窗口，默认 7 |
+| `--hn-per-batch / --hf-per-batch` | 每批条数，默认 30 / 10 |
+| `--enrich-batches N` | 只对前 N 批抓正文，默认 2（正文只是写摘要的输入） |
+| `--max-batches N` | 0 = 由候选数决定；批次数取两源能凑满的较小值 |
+| `render_board.py --standalone` | 包成完整 HTML 文档；默认输出 Artifact 片段 |
+
+要点：
+
+- **批次数受 HF 限制**。HF 日报每天仅 23–33 篇，近 7 天约 140 篇 → 14 批；HN 同期约 670 条本可切 22 批。
+- **排名是全局连续的**：第 2 批显示第 31–60 名，不重新从 01 开始 —— 否则「往下翻」在页面上看不出来。
+- **摘要按批补**。未写摘要的条目显式标「摘要待补」，绝不用自动文本填充。补完摘要后用**同一文件路径**重新发布 Artifact，落回同一 URL，**用户的星标不受影响**（localStorage 按 artifact 地址隔离，重发布不清空）。
+- **收藏只在浏览器本地**。换设备、清站点数据、无痕窗口会丢；页面在沙箱里跑，无法存盘，所以备份面板只能复制粘贴，**不要做下载按钮 —— Artifact 沙箱会让它静默失效**。
+- 交互没有浏览器可测时，用 `node` + 最小 DOM 桩直接跑产物里的真实 JS（本仓库历史上用过 `boardtest.mjs` 的做法），务必覆盖 localStorage 抛异常的情形。
+
+## 站点同步（每次渲染都要做）
+
+产出发布在 GitHub Pages：`Chin-Sun/TrendBrief` 仓库根目录，**`index.html` 是新闻板，
+`digest.html` 是日报**。两个渲染器都有 `--site-out PATH`，渲染时一并写过去 ——
+**不要事后手工 cp，那一定会漏。**
+
+```bash
+D=~/Desktop/Projects/Conv/TrendBrief
+python3 <skill>/scripts/render_board.py board_data.json summaries.json \
+    -o ~/Desktop/daily_bull.html --sibling "📰 日报|digest.html" --site-out "$D/index.html"
+python3 <skill>/scripts/render_html.py digest_data.json summaries.json \
+    -o ~/Desktop/digest_2026-09-01.html --sibling "🐮 新闻板|index.html" --site-out "$D/digest.html"
+```
+
+- `--site-out` 写的**始终是完整 HTML 文档**（`render_board.py` 默认输出的是 Artifact 片段，
+  站点副本会自动补外壳）。片段直接当网页挂上去在部分浏览器里会出问题。
+- `--sibling "文本|href"` 生成两页互指的站内导航，别让读者掉进单页孤岛。
+- 仓库根有 `.nojekyll`（跳过 Jekyll 构建），`Reddit/` 在 `.gitignore` 里 —— 那是取数输入，
+  且仓库公开，不要把抓来的 Reddit 数据推上去。
+
 ## Reddit：三模式降级
 
 Reddit 是四个信源里唯一封锁免鉴权访问的（`.json` 返回反爬 HTML、RSS 返回 0 字节、公共镜像 403）。

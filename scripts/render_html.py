@@ -69,6 +69,10 @@ a{color:inherit}
 .ch:disabled{opacity:.45;cursor:not-allowed;text-decoration:line-through}
 .ch .c{font-family:var(--head);font-style:italic;text-transform:none;
   letter-spacing:0;margin-left:5px}
+.sib{margin-left:auto;font-family:var(--sans);font-size:11.5px;letter-spacing:.09em;
+  text-transform:uppercase;color:var(--accent);text-decoration:none;
+  border-bottom:1px solid transparent;align-self:center}
+.sib:hover{border-bottom-color:var(--accent)}
 
 /* 频道过滤：body 无 data-ch（例如禁用 JS）时不匹配任何规则，全部条目照常显示 */
 body[data-ch="hn"]     .story:not([data-source="hn"]),
@@ -262,7 +266,15 @@ def render_sources(status):
     return "".join(bits)
 
 
-def render_channels(data):
+def sibling_link(spec):
+    """--sibling "文本|href" → 站内导航链接。两页互指，别让读者掉进单页孤岛。"""
+    if not spec or "|" not in spec:
+        return ""
+    text, href = spec.split("|", 1)
+    return f'<a class="sib" href="{esc(href.strip())}">{esc(text.strip())} →</a>'
+
+
+def render_channels(data, sibling=None):
     """频道过滤条。计数在 Python 端算好；未采集的信源渲染成 disabled 并说明原因。"""
     counts = {}
     for sec in data["sections"]:
@@ -282,7 +294,8 @@ def render_channels(data):
             why = st.get("reason") or "本期无入选条目"
             bits.append(f'<button class="ch" data-ch="{esc(key)}" type="button" disabled '
                         f'title="{esc(why)}">{label} <span class="c">0</span></button>')
-    return '<nav class="channels" role="tablist">' + "".join(bits) + "</nav>"
+    return ('<nav class="channels" role="tablist">' + "".join(bits)
+            + sibling_link(sibling) + "</nav>")
 
 
 CHANNEL_JS = """
@@ -380,7 +393,7 @@ def render_footer(data, summaries, missing):
             + "".join(f"<p>{n}</p>" for n in notes) + "</footer>")
 
 
-def render(data, summaries, nameplate):
+def render(data, summaries, nameplate, sibling=None):
     now = int(datetime.now(timezone.utc).timestamp())
     try:
         gen_dt = datetime.fromisoformat(
@@ -419,7 +432,7 @@ def render(data, summaries, nameplate):
     <div class="tagline">四源技术热帖简报　·　排名依据平台原生计数</div>
     <div class="rule-double"></div>
     <div class="sources">{render_sources(data['source_status'])}</div>
-    {render_channels(data)}
+    {render_channels(data, sibling)}
   </header>
   {sections}
   {render_footer(data, summaries, missing)}
@@ -437,6 +450,10 @@ def main():
                     help="{sid: 200字中文摘要} 的 JSON；省略则全部标为缺失")
     ap.add_argument("-o", "--out", default="digest.html")
     ap.add_argument("--nameplate", default="The Daily Digest")
+    ap.add_argument("--site-out", default=None, metavar="PATH",
+                    help="额外写一份到此路径（站点用）")
+    ap.add_argument("--sibling", default=None, metavar="文本|href",
+                    help='站内导航链接，如 "🐮 新闻板|index.html"')
     args = ap.parse_args()
 
     with open(args.data, encoding="utf-8") as f:
@@ -448,9 +465,13 @@ def main():
         if not isinstance(summaries, dict):
             sys.exit("summaries 必须是 {sid: 摘要} 的对象")
 
-    doc = render(data, summaries, args.nameplate)
+    doc = render(data, summaries, args.nameplate, args.sibling)
     with open(args.out, "w", encoding="utf-8") as f:
         f.write(doc)
+    if args.site_out:
+        with open(args.site_out, "w", encoding="utf-8") as f:
+            f.write(doc)
+        print(f"✓ 同步 {args.site_out}", file=sys.stderr)
 
     total = sum(len(s["items"]) for s in data["sections"])
     missing = sum(1 for s in data["sections"] for it in s["items"]

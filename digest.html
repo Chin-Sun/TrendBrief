@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>The Daily Digest · 2026年9月4日 星期五</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&display=swap"
+      rel="stylesheet">
+<style>
+:root{
+  --paper:#fff; --ink:#121212; --ink-soft:#2b2b2b; --muted:#6b6b6b;
+  --rule:#dcdcdc; --rule-strong:#121212; --accent:#326891; --tint:#f6f6f4;
+  --serif:"Songti SC","Noto Serif SC","Source Han Serif SC",Georgia,"Times New Roman",serif;
+  --head:Georgia,"Times New Roman","Songti SC","Noto Serif SC",serif;
+  --sans:"Helvetica Neue",Helvetica,Arial,"PingFang SC","Hiragino Sans GB",sans-serif;
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    --paper:#121212; --ink:#f2f2f2; --ink-soft:#e0e0e0; --muted:#9b9b9b;
+    --rule:#343434; --rule-strong:#f2f2f2; --accent:#83b4de; --tint:#1b1b1b;
+  }
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);
+     font-family:var(--serif);-webkit-font-smoothing:antialiased}
+a{color:inherit}
+.wrap{max-width:1180px;margin:0 auto;padding:0 26px 72px}
+
+/* ---------- 报头 ---------- */
+.masthead{padding-top:26px}
+.dateline{display:flex;justify-content:space-between;align-items:baseline;gap:16px;
+  font-family:var(--sans);font-size:11px;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--muted);border-bottom:1px solid var(--rule);padding-bottom:9px;flex-wrap:wrap}
+.nameplate{font-family:"UnifrakturMaguntia",Georgia,serif;font-weight:400;
+  font-size:clamp(40px,9vw,84px);line-height:1.05;text-align:center;
+  margin:20px 0 12px;letter-spacing:.01em}
+.tagline{text-align:center;font-family:var(--sans);font-size:11.5px;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--muted);padding-bottom:14px}
+.rule-double{border-top:3px double var(--rule-strong);margin-bottom:8px}
+
+/* ---------- 信源状态条 ---------- */
+.sources{display:flex;flex-wrap:wrap;gap:6px 22px;padding:11px 0 13px;
+  border-bottom:1px solid var(--rule);font-family:var(--sans);font-size:11.5px;color:var(--muted)}
+.sources b{color:var(--ink);font-weight:600;letter-spacing:.03em}
+.src-ok::before{content:"●";color:#2e7d4f;margin-right:6px;font-size:9px;vertical-align:2px}
+.src-off::before{content:"○";color:var(--muted);margin-right:6px;font-size:9px;vertical-align:2px}
+
+/* ---------- 频道切换 ---------- */
+.channels{display:flex;flex-wrap:wrap;gap:8px;padding:13px 0;
+  border-bottom:1px solid var(--rule)}
+.ch{font-family:var(--sans);font-size:11.5px;letter-spacing:.09em;text-transform:uppercase;
+  background:none;border:1px solid var(--rule);color:var(--muted);
+  padding:6px 13px;border-radius:2px;cursor:pointer;transition:none}
+.ch:hover:not(:disabled){border-color:var(--rule-strong);color:var(--ink)}
+.ch.on{background:var(--rule-strong);color:var(--paper);border-color:var(--rule-strong)}
+.ch:disabled{opacity:.45;cursor:not-allowed;text-decoration:line-through}
+.ch .c{font-family:var(--head);font-style:italic;text-transform:none;
+  letter-spacing:0;margin-left:5px}
+.sib{margin-left:auto;font-family:var(--sans);font-size:11.5px;letter-spacing:.09em;
+  text-transform:uppercase;color:var(--accent);text-decoration:none;
+  border-bottom:1px solid transparent;align-self:center}
+.sib:hover{border-bottom-color:var(--accent)}
+
+/* 频道过滤：body 无 data-ch（例如禁用 JS）时不匹配任何规则，全部条目照常显示 */
+body[data-ch="hn"]     .story:not([data-source="hn"]),
+body[data-ch="reddit"] .story:not([data-source="reddit"]),
+body[data-ch="hf"]     .story:not([data-source="hf"]),
+body[data-ch="devto"]  .story:not([data-source="devto"]){display:none}
+
+/* ---------- 版块 ---------- */
+section{margin-top:46px}
+.sec-head{display:flex;justify-content:space-between;align-items:baseline;gap:14px;
+  border-bottom:2px solid var(--rule-strong);padding-bottom:7px;flex-wrap:wrap}
+.sec-head h2{font-family:var(--head);font-size:25px;font-weight:700;margin:0;letter-spacing:.01em}
+.sec-head .k{font-family:var(--sans);font-size:10.5px;letter-spacing:.15em;
+  text-transform:uppercase;color:var(--muted)}
+
+/* ---------- 条目通用 ---------- */
+.kicker{font-family:var(--sans);font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;
+  color:var(--muted);margin-bottom:9px;display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.kicker .n{font-family:var(--head);font-size:13px;letter-spacing:0;color:var(--muted);
+  font-style:italic}
+.kicker .s{color:var(--ink);font-weight:700}
+h3.hl,h2.hl{font-family:var(--head);font-weight:700;margin:0 0 9px;letter-spacing:-.005em}
+.hl a{text-decoration:none}
+.hl a:hover{text-decoration:underline;text-underline-offset:3px}
+.meta{font-family:var(--sans);font-size:11.5px;color:var(--muted);margin-bottom:11px;
+  line-height:1.6}
+.meta .sep{opacity:.5;margin:0 6px}
+.sum{font-size:15px;line-height:1.78;color:var(--ink-soft);margin:0 0 13px;
+  text-align:justify;text-justify:inter-ideograph}
+.sum.missing{color:var(--muted);font-style:italic;text-align:left}
+.links{font-family:var(--sans);font-size:11.5px;letter-spacing:.04em;
+  display:flex;gap:16px;flex-wrap:wrap}
+.links a{color:var(--accent);text-decoration:none;border-bottom:1px solid transparent}
+.links a:hover{border-bottom-color:var(--accent)}
+.also{font-family:var(--sans);font-size:11px;color:var(--muted);margin-top:7px}
+
+/* ---------- 多栏网格 ---------- */
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:34px 0;padding-top:26px}
+.story{padding:0 26px;border-left:1px solid var(--rule)}
+.story h3.hl{font-size:19px;line-height:1.28}
+/* 无 JS 时的静态列位；有 JS 时由 data-col 覆盖（过滤后 nth-child 会错位） */
+.story:nth-child(3n+1){border-left:none;padding-left:0}
+.story:nth-child(3n){padding-right:0}
+.story[data-col]{border-left:1px solid var(--rule);padding-left:26px;padding-right:26px}
+.story[data-col="0"]{border-left:none;padding-left:0}
+.story[data-col="last"]{padding-right:0}
+
+/* ---------- 头条：由 class 控制，过滤后可换人 ---------- */
+.story.is-lead{grid-column:1/-1;border-left:none!important;
+  padding:0 0 24px!important;border-bottom:1px solid var(--rule);margin-bottom:2px}
+.story.is-lead h3.hl{font-size:clamp(27px,4.1vw,43px);line-height:1.13;margin-bottom:12px}
+.story.is-lead .sum{font-size:16px;line-height:1.8;column-count:2;column-gap:36px;
+  column-rule:1px solid var(--rule)}
+@media (max-width:900px){
+  .grid{grid-template-columns:repeat(2,1fr);gap:30px 0}
+  .story:nth-child(3n+1){border-left:1px solid var(--rule);padding-left:26px}
+  .story:nth-child(3n){padding-right:26px}
+  .story:nth-child(2n+1){border-left:none;padding-left:0}
+  .story:nth-child(2n){padding-right:0}
+  .story.is-lead .sum{column-count:1}
+}
+@media (max-width:620px){
+  .wrap{padding:0 18px 56px}
+  .grid{grid-template-columns:1fr;gap:0}
+  .story{border-left:none!important;padding:22px 0!important;
+         border-top:1px solid var(--rule)}
+  .story.is-lead{border-top:none;padding-top:4px!important}
+  .story:first-child{border-top:none;padding-top:4px!important}
+}
+
+/* ---------- 编者按 ---------- */
+footer{margin-top:58px;border-top:3px double var(--rule-strong);padding-top:20px}
+footer h4{font-family:var(--sans);font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--muted);margin:0 0 12px}
+footer p{font-size:13.5px;line-height:1.8;color:var(--muted);margin:0 0 10px;max-width:74ch}
+footer code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;
+  background:var(--tint);padding:1px 5px;border-radius:3px}
+.note-warn{border-left:3px solid var(--rule-strong);padding-left:14px;color:var(--ink-soft)}
+
+@media print{
+  body{background:#fff;color:#000}
+  .links,.channels{display:none}
+  section{break-inside:avoid}
+  .story{break-inside:avoid}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="masthead">
+    <div class="dateline">
+      <span>2026年9月4日 星期五</span>
+      <span>本期 20 条　·　信源 4/4 在线</span>
+      <span>采集于 09:50</span>
+    </div>
+    <h1 class="nameplate">The Daily Digest</h1>
+    <div class="tagline">四源技术热帖简报　·　排名依据平台原生计数</div>
+    <div class="rule-double"></div>
+    <div class="sources"><span class="src-ok"><b>Hacker News</b> 662 条候选</span><span class="src-ok"><b>r/LocalLLaMA</b> 99 条候选（模式 B-pdf）</span><span class="src-ok"><b>Hugging Face Papers</b> 202 条候选</span><span class="src-ok"><b>DEV Community</b> 149 条候选</span></div>
+    <nav class="channels" role="tablist"><button class="ch on" data-ch="all" type="button">全部 <span class="c">20</span></button><button class="ch" data-ch="hn" type="button">Hacker News <span class="c">11</span></button><button class="ch" data-ch="reddit" type="button">r/LocalLLaMA <span class="c">4</span></button><button class="ch" data-ch="hf" type="button">Hugging Face Papers <span class="c">3</span></button><button class="ch" data-ch="devto" type="button">DEV Community <span class="c">2</span></button><a class="sib" href="index.html">🐮 新闻板 →</a></nav>
+  </header>
+  
+    <section data-sec="d7">
+      <div class="sec-head"><h2>七日要闻</h2>
+        <span class="k">PAST 7 DAYS · TOP 10</span></div>
+      <div class="grid">
+      <article class="story is-lead"
+               data-source="hn" data-sid="hn-49554643">
+        <div class="kicker"><span class="n">01</span>
+          <span class="s">Hacker News</span>
+          <span>9月4日</span></div>
+        <h3 class="hl"><a href="https://news.ycombinator.com/item?id=49554643" target="_blank"
+          rel="noopener">GPT-6 Astra</a></h3>
+        <div class="meta">1,323 票<span class="sep">·</span>1,048 评论<span class="sep">·</span>9月4日<span class="sep">·</span>7 小时前<span class="sep">·</span>得分 1.000</div>
+        <p class="sum">OpenAI 发布 GPT-6 Astra，称其为迄今最智能也最对齐的模型，在计算机操作、浏览、软件工程、网络安全、科学与专业工作上均达到最先进水平。官方数据颇为激进：FrontierMath Tier 4 得分 98% 近乎饱和，ARC-AGI-3 达 99.9%，ExploitBench 满分 100%，并称它已协助解决数学中悬置多年的开放问题。1322 票、1043 条评论，是本期两站最热条目。</p>
+        <div class="links"><a href="https://openai.com/index/gpt-6-astra/" target="_blank" rel="noopener">阅读原文 →</a><a href="https://news.ycombinator.com/item?id=49554643" target="_blank" rel="noopener">讨论区 →</a></div>
+        
+      </article>
+      <article class="story"
+               data-source="hn" data-sid="hn-49526069">
+        <div class="kicker"><span class="n">02</span>
+          <span class="s">Hacker News</span>
+          <span>9月2日</span></div>
+        <h3 class="hl"><a href="https://news.ycombinator.com/item?id=49526069" target="_blank"
+          rel="noopener">How accurate have Ed Zitron&#x27;s AI skeptic predictions been?</a></h3>
+        <div class="meta">864 票<span class="sep">·</span>1,035 评论<span class="sep">·</span>9月2日<span class="sep">·</span>2 天前<span class="sep">·</span>得分 0.996</div>
+        <p class="sum">Dan Luu 逐条核对了 AI 怀疑派中被引用最多的 Ed Zitron 的历次预测兑现情况。他先交代自己的立场偏差：2022 年系统检视过库兹韦尔等未来学家的预测，发现结论与推理普遍站不住；2015 年又写过人们低估 AI 替代岗位的能力，且多次公开重申。1035 条评论，是本期讨论量最大的条目，评论区对「只挑对自己有利的数字」这一批评有共鸣。</p>
+        <div class="links"><a href="https://danluu.com/zitron/" target="_blank" rel="noopener">阅读原文 →</a><a href="https://news.ycombinator.com/item?id=49526069" target="_blank" rel="noopener">讨论区 →</a></div>
+        
+      </article>
+      <article class="story"
+               data-source="hn" data-sid="hn-49514878">
+        <div class="kicker"><span class="n">03</span>
+          <span class="s">Hacker News</span>
+          <span>9月1日</span></div>
+        <h3 class="hl"><a href="https://news.ycombinator.com/item?id=49514878" target="_blank"
+          rel="noopener">Google Has Removed MV2 Extensions from the Chrome Web Store, Including UBO</a></h3>
+        <div class="meta">756 票<span class="sep">·</span>613 评论<span class="sep">·</span>9月1日<span class="sep">·</span>3 天前<span class="sep">·</span>得分 0.991</div>
+        <p class="sum">Google 完成了持续数年的扩展迁移的最后一步：Chrome 网上应用店中所有剩余的 Manifest V2 扩展全部下架，其中包括 uBlock Origin——公认功能最强的内容拦截器之一。官方称已装在 Chrome 138 或更早版本上的 MV2 扩展会保留，但无法再更新，一旦移除也无法重装。由于该应用店同时是 Brave 等 Chromium 系浏览器的主要扩展来源，影响范围超出 Chrome 本身。420 条评论里出现频率最高的回应只有一句：换 Firefox。</p>
+        <div class="links"><a href="https://webiterate.dev/google-removed-extensions-ublock-origin-108/" target="_blank" rel="noopener">阅读原文 →</a><a href="https://news.ycombinator.com/item?id=49514878" target="_blank" rel="noopener">讨论区 →</a></div>
+        
+      </article>
+      <article class="story"
+               data-source="hn" data-sid="hn-49517448">
+        <div class="kicker"><span class="n">04</span>
+          <span class="s">Hacker News</span>
+          <span>9月1日</span></div>
+        <h3 class="hl"><a href="https://news.ycombinator.com/item?id=49517448" target="_blank"
+          rel="noopener">Fastpotify</a></h3>
+        <div class="meta">848 票<span class="sep">·</span>560 评论<span class="sep">·</span>9月1日<span class="sep">·</span>2 天前<span class="sep">·</span>得分 0.991</div>
+        <p class="sum">Fastpotify 是用 Rust 写的原生 Spotify 客户端，覆盖 Linux、macOS 与 Windows。它不带浏览器引擎，启动在一秒以内，常驻内存约 100–250MB；支持本地无缝播放至 320kbps，也能通过 Spotify Connect 控制音箱、手机或电视。还内置了 Winamp 2 皮肤的小播放器、频谱与均衡器，以及独立窗口的 MilkDrop 可视化。评论区提醒：Spotify 正在扼杀它所依赖的 librespot。</p>
+        <div class="links"><a href="https://fastpotify.rocks/" target="_blank" rel="noopener">阅读原文 →</a><a href="https://news.ycombinator.com/item?id=49517448" target="_blank" rel="noopener">讨论区 →</a></div>
+        
+      </article>
+      <article class="story"
+               data-source="reddit" data-sid="rd-1w2cxcw">
+        <div class="kicker"><span class="n">05</span>
+          <span class="s">r/LocalLLaMA</span>
+          <span>8月30日</span></div>
+        <h3 class="hl"><a href="https://www.reddit.com/r/LocalLLaMA/comments/1w2cxcw/some_people_said_the_minecraft_clone_i_fully/" target="_blank"
+          rel="noopener">Some people said the Minecraft clone I fully vibecoded with Qwen3.8-27B Q4 is not that impressive because Minecraft is in the training data, so I had the model add 4 things that are probably not.</a></h3>
+        <div class="meta">1,648 票<span class="sep">·</span>273 评论<span class="sep">·</span>2 转发<span class="sep">·</span>8月30日<span class="sep">·</span>4 天前<span class="sep">·</span>得分 0.950</div>
+        <p class="sum">作者先前用 Qwen3.8-27B Q4 全程 vibecoding 做出一个 Minecraft 克隆，被质疑「Minecraft 本来就在训练数据里」算不上真本事，于是让模型又加了四个大概率不在训练数据中的功能作为回应，用可玩的增量来反驳记忆复现的说法。帖子是一段视频演示，没有文字正文，本条摘要据标题与 1560 票、250 条评论、Generation 标签写成。</p>
+        <div class="links"><a href="https://v.redd.it/tvlr8gd1ehmh1" target="_blank" rel="noopener">阅读原文 →</a><a href="https://www.reddit.com/r/LocalLLaMA/comments/1w2cxcw/some_people_said_the_minecraft_clone_i_fully/" target="_blank" rel="noopener">讨论区 →</a></div>
+        
+      </article>
+      <article class="story"
+               data-source="reddit" data-sid="rd-1w28x8u">
+        <div class="kicker"><span class="n">06</span>
+          <span class="s">r/LocalLLaMA</span>
+          <span>8月30日</span></div>
+        <h3 class="hl"><a href="https://www.reddit.com/r/LocalLLaMA/comments/1w28x8u/its_official_192gb_framework/" target="_blank"
+          rel="noopener">It&#x27;s official! 192GB Framework</a></h3>
+        <div class="meta">965 票<span class="sep">·</span>286 评论<span class="sep">·</span>2 转发<span class="sep">·</span>8月30日<span class="sep">·</span>4 天前<span class="sep">·</span>得分 0.947</div>
+        <p class="sum">Framework 官网上线了 192GB 内存的 SKU。发帖人按其现有内存档位（32/64/128）的定价推算，这块主板大约会落在 4500 美元。他还提到听说的两点：PCIe 插槽在背面是开放的，或许还会做到能供 75W；较小容量的 SKU 可能会有新的板卡修订版。965 票、286 条评论，反映本地推理社区对大内存统一架构的持续渴求。</p>
+        <div class="links"><a href="https://i.redd.it/fbvr8x017gmh1.png" target="_blank" rel="noopener">阅读原文 →</a><a href="https://www.reddit.com/r/LocalLLaMA/comments/1w28x8u/its_official_192gb_framework/" target="_blank" rel="noopener">讨论区 →</a></div>
+        
+      </article>
+      <article class="story"
+               data-source="reddit" data-sid="rd-1w0lz7e">
+        <div class="kicker"><span class="n">07</span>
+          <span class="s">r/LocalLLaMA</span>
+          <span>8月28日</span></div>
+        <h3 class="hl"><a href="https://www.reddit.com/r/LocalLLaMA/comments/1w0lz7e/claude_mods_didnt_like_that_somehow/" target="_blank"
+          rel="noopener">claude mods didn&#x27;t like that, somehow</a></h3>
+        <div class="meta">1,483 票<span class="sep">·</span>372 评论<span class="sep">·</span>1 转发<span class="sep">·</span>8月28日<span class="sep">·</span>6 天前<span class="sep">·</span>得分 0.934</div>
+        <p class="sum">r/LocalLLaMA 的一张截图帖，讲的是 Claude 相关社群的管理员对某件事不太买账。帖子是图片，**没有文字正文**，本条摘要依据标题、Other 标签与 1483 票、372 条评论、1 次转发这几项可核数据写成，不对图片内容做任何推断——想知道具体是什么，需要点开原图。</p>
+        <div class="links"><a href="https://i.redd.it/537x3esh63mh1.png" target="_blank" rel="noopener">阅读原文 →</a><a href="https://www.reddit.com/r/LocalLLaMA/comments/1w0lz7e/claude_mods_didnt_like_that_somehow/" target="_blank" rel="noopener">讨论区 →</a></div>
+        
+      </article>
+      <article class="story"
+               data-source="hf" data-sid="hf-2609.00111">
+        <div class="kicker"><span class="n">08</span>
+          <span class="s">Hugging Face Papers</span>
+          <span>9月2日</span></div>
+        <h3 class="hl"><a href="https://huggingface.co/papers/2609.00111" target="_blank"
+          rel="noopener">Qwen-Drive-1.0: An Initial Step towards a Vision-Language Foundation Model for Autonomous Driving</a></h3>
+        <div class="meta">361 票<span class="sep">·</span>5 评论<span class="sep">·</span>9月2日<span class="sep">·</span>2 天前<span class="sep">·</span>得分 0.977</div>
+        <p class="sum">Qwen-Drive-1.0 是面向自动驾驶的视觉语言基础模型的初步尝试。它保留预训练视觉语言模型的架构，在统一框架内整合三维感知、视觉问答与运动规划。外挂的鸟瞰图感知头同时做三维目标检测、语义占据预测与鸟瞰图分割，既探测共享表示中可提取多少三维信息，也提供了一个显式可检查的三维场景接口；规划专家则基于共享表示生成自车未来轨迹。</p>
+        <div class="links"><a href="https://arxiv.org/abs/2609.00111" target="_blank" rel="noopener">阅读原文 →</a><a href="https://huggingface.co/papers/2609.00111" target="_blank" rel="noopener">讨论区 →</a></div>
+        
+      </article>
+      <article class="story"
+               data-source="hf" data-sid="hf-2608.31106">
+        <div class="kicker"><span class="n">09</span>
+          <span class="s">Hugging Face Papers</span>
+          <span>9月1日</span></div>
+        <h3 class="hl"><a href="https://huggingface.co/papers/2608.31106" target="_blank"
+          rel="noopener">DreamX-Creator: Democratizing Native Audio-Video Generation at 2K Resolution</a></h3>
+        <div class="meta">97 票<span class="sep">·</span>6 评论<span class="sep">·</span>9月1日<span class="sep">·</span>3 天前<span class="sep">·</span>得分 0.971</div>
+        <p class="sum">DreamX-Creator 1.0 用一个 7B 生成器实现音视频原生联合生成，不再把配音拆成独立后续阶段。给定首帧与文本提示，音频与视频两路先各自去噪，网络后半段经门控跨模态注意力耦合，门控按 token 与注意力头分别调制每路输出。配套数据系统筛选时序一致的片段并做结构化标注；训练为两阶段预训练加高质量微调，再以模态感知反馈做强化学习，末端用自回归单步精修输出 2K 分辨率。</p>
+        <div class="links"><a href="https://arxiv.org/abs/2608.31106" target="_blank" rel="noopener">阅读原文 →</a><a href="https://huggingface.co/papers/2608.31106" target="_blank" rel="noopener">讨论区 →</a></div>
+        
+      </article>
+      <article class="story"
+               data-source="devto" data-sid="dv-4538206">
+        <div class="kicker"><span class="n">10</span>
+          <span class="s">DEV Community</span>
+          <span>8月31日</span></div>
+        <h3 class="hl"><a href="https://dev.to/francistrdev/how-long-does-it-take-for-you-to-write-a-devto-article-49m1" target="_blank"
+          rel="noopener">How long does it take for you to write a dev.to article?</a></h3>
+        <div class="meta">112 票<span class="sep">·</span>129 评论<span class="sep">·</span>8月31日<span class="sep">·</span>3 天前<span class="sep">·</span>得分 1.000</div>
+        <p class="sum">一篇 dev.to 上的闲聊贴，问大家写一篇文章要花多久。作者自答两小时，且强调不是玩笑：他通常不预先规划，技术类话题偶尔会，但多数时候是直接在 dev.to 里边写边理。非技术类的文章他一般周末想到个点子却不落笔，只寄希望于过几天还记得——记不得就算了，反正总能凑出点别的。129 条评论，是本期 dev.to 互动量最高的一条。</p>
+        <div class="links"><a href="https://dev.to/francistrdev/how-long-does-it-take-for-you-to-write-a-devto-article-49m1" target="_blank" rel="noopener">讨论区 →</a></div>
+        
+      </article></div>
+    </section>
+    <section data-sec="d3">
+      <div class="sec-head"><h2>三日速览</h2>
+        <span class="k">PAST 3 DAYS · TOP 5</span></div>
+      <div class="grid">
+      <article class="story is-lead"
+               data-source="hn" data-sid="hn-49527748">
+        <div class="kicker"><span class="n">01</span>
+          <span class="s">Hacker News</span>
+          <span>9月2日</span></div>
+        <h3 class="hl"><a href="https://news.ycombinator.com/item?id=49527748" target="_blank"
+          rel="noopener">Hang on to Your Firefox</a></h3>
+        <div class="meta">968 票<span class="sep">·</span>528 评论<span class="sep">·</span>9月2日<span class="sep">·</span>2 天前<span class="sep">·</span>得分 0.989</div>
+        <p class="sum">一篇为 Firefox 辩护的短文，切入点是那句「别把洗澡水和孩子一起倒掉」。作者的直接触发是有博主因为 Firefox 开了 X 账号而改用 Vivaldi，却对 Vivaldi 同样在 X、乃至在 Threads、Facebook、Instagram、YouTube 上视而不见。他更想说的是 HN 上每次相关话题都会冒出的那些绕圈子的讨厌理由。968 票、528 条评论，争议度本期居前。</p>
+        <div class="links"><a href="https://www.newsonaut.com/articles/hang-on-to-your-firefox" target="_blank" rel="noopener">阅读原文 →</a><a href="https://news.ycombinator.com/item?id=49527748" target="_blank" rel="noopener">讨论区 →</a></div>
+        
+      </article>
+      <article class="story"
+               data-source="hn" data-sid="hn-49550772">
+        <div class="kicker"><span class="n">02</span>
+          <span class="s">Hacker News</span>
+          <span>9月3日</span></div>
+        <h3 class="hl"><a href="https://news.ycombinator.com/item?id=49550772" target="_blank"
+          rel="noopener">.name Termination</a></h3>
+        <div class="meta">1,361 票<span class="sep">·</span>378 评论<span class="sep">·</span>9月3日<span class="sep">·</span>11 小时前<span class="sep">·</span>得分 0.981</div>
+        <p class="sum">Verisign 于 2026 年 4 月提议销毁整个 `.name` 三级域层级以简化管理，ICANN 在 7 月 28 日批准。作者二十五年前注册 neil.fraser.name 作为自己在互联网上的稳定落点——它比 YouTube、Facebook 和智能手机都早，女儿出生几分钟后他又注册了 beverly.fraser.name。他几天前才从注册商邮件里得知此事。1359 票，是 HN 本期票数最高的条目。</p>
+        <div class="links"><a href="https://neil.fraser.name/news/2026/09/03/" target="_blank" rel="noopener">阅读原文 →</a><a href="https://news.ycombinator.com/item?id=49550772" target="_blank" rel="noopener">讨论区 →</a></div>
+        
+      </article>
+      <article class="story"
+               data-source="reddit" data-sid="rd-1w65uhf">
+        <div class="kicker"><span class="n">03</span>
+          <span class="s">r/LocalLLaMA</span>
+          <span>9月3日</span></div>
+        <h3 class="hl"><a href="https://www.reddit.com/r/LocalLLaMA/comments/1w65uhf/its_official_nvidia_to_acquire_hugging_face_for/" target="_blank"
+          rel="noopener">It&#x27;s official! Nvidia to acquire Hugging Face for 12.9 billion dollars.</a></h3>
+        <div class="meta">1,302 票<span class="sep">·</span>346 评论<span class="sep">·</span>1 转发<span class="sep">·</span>9月3日<span class="sep">·</span>13 小时前<span class="sep">·</span>得分 0.923</div>
+        <p class="sum">英伟达官方博客确认收购 Hugging Face，作价 129.3 亿美元。公告称双方将共同扩展 HF 平台、强化其基础设施，并向全球开发者与机构扩大 AI 的可及性。文中给出的平台体量：超过 1800 万开发者、研究者与创作者，共享 300 多万个模型、50 万个数据集与 100 万个应用。这条在 r/LocalLLaMA 拿到 1302 票、346 条评论，是本周该版最受关注的消息之一。</p>
+        <div class="links"><a href="https://blogs.nvidia.com/blog/nvidia-to-acquire-hugging-face/" target="_blank" rel="noopener">阅读原文 →</a><a href="https://www.reddit.com/r/LocalLLaMA/comments/1w65uhf/its_official_nvidia_to_acquire_hugging_face_for/" target="_blank" rel="noopener">讨论区 →</a></div>
+        
+      </article>
+      <article class="story"
+               data-source="hf" data-sid="hf-2609.01591">
+        <div class="kicker"><span class="n">04</span>
+          <span class="s">Hugging Face Papers</span>
+          <span>9月2日</span></div>
+        <h3 class="hl"><a href="https://huggingface.co/papers/2609.01591" target="_blank"
+          rel="noopener">StudentSim: Training LLM-based Student Simulators</a></h3>
+        <div class="meta">478 票<span class="sep">·</span>4 评论<span class="sep">·</span>9月2日<span class="sep">·</span>2 天前<span class="sep">·</span>得分 0.974</div>
+        <p class="sum">AI 导师要真正有用，就得因人施教，但「哪种指导对哪类学生有效」的证据从真实学习者身上收集既慢又贵。学生模拟器可以充当代理信号，然而现有做法各有短板：状态追踪模型能拟合行为却处理不了解释与纠正，LLM 角色扮演能流畅跟随指导却无法可靠地匹配被模仿学生的真实水平。StudentSim 用「合并训练 + 逐生特化」把稀疏的个体数据转化为个性化模拟器。</p>
+        <div class="links"><a href="https://arxiv.org/abs/2609.01591" target="_blank" rel="noopener">阅读原文 →</a><a href="https://huggingface.co/papers/2609.01591" target="_blank" rel="noopener">讨论区 →</a></div>
+        
+      </article>
+      <article class="story"
+               data-source="devto" data-sid="dv-4542737">
+        <div class="kicker"><span class="n">05</span>
+          <span class="s">DEV Community</span>
+          <span>9月1日</span></div>
+        <h3 class="hl"><a href="https://dev.to/james_anderson_h/building-with-ai-when-you-dont-know-architecture-a-survival-guide-1ma3" target="_blank"
+          rel="noopener">Building With AI When You Don&#x27;t Know Architecture: A Survival Guide</a></h3>
+        <div class="meta">78 票<span class="sep">·</span>53 评论<span class="sep">·</span>9月1日<span class="sep">·</span>2 天前<span class="sep">·</span>得分 1.000</div>
+        <p class="sum">写给「不懂架构却在用 AI 造东西」的人的生存指南。作者描摹了一个许多人会认出的时刻：你有个应用点子，其实并不真会写，但对着 AI 描述一番就拿到了能跑的代码，感觉像魔法。于是你加第二个功能、第三个，到第五个左右开始崩——修好一处坏掉两处，想求助却连问题都说不清，因为你已经看不懂自己的项目了。他指出卡住大多数人的正是这堵墙，而非写代码本身。</p>
+        <div class="links"><a href="https://dev.to/james_anderson_h/building-with-ai-when-you-dont-know-architecture-a-survival-guide-1ma3" target="_blank" rel="noopener">讨论区 →</a></div>
+        
+      </article></div>
+    </section>
+    <section data-sec="hn3">
+      <div class="sec-head"><h2>Hacker News 专栏</h2>
+        <span class="k">HACKER NEWS · PAST 3 DAYS · TOP 5</span></div>
+      <div class="grid">
+      <article class="story is-lead"
+               data-source="hn" data-sid="hn-49541256">
+        <div class="kicker"><span class="n">01</span>
+          <span class="s">Hacker News</span>
+          <span>9月3日</span></div>
+        <h3 class="hl"><a href="https://news.ycombinator.com/item?id=49541256" target="_blank"
+          rel="noopener">Muse Spark 1.3</a></h3>
+        <div class="meta">678 票<span class="sep">·</span>438 评论<span class="sep">·</span>9月3日<span class="sep">·</span>1 天前<span class="sep">·</span>得分 0.978</div>
+        <p class="sum">Meta 发布 Muse Spark 1.3。开发者页面正文未能获取，实质内容在 438 条讨论里：Simon Willison 照例用「生成一只骑自行车的鹈鹕 SVG」做横向对比，1.3 版单次约 4.2 美分、38 秒，车架、翅膀与帽子都明显好于 1.2 版（后者未经要求就自作主张加了动画），他还按五档推理强度各跑了一只。真正的技术博客在 Meta 研究站，另有单独的讨论帖。</p>
+        <div class="links"><a href="https://developer.meta.com/ai/models/muse-spark/" target="_blank" rel="noopener">阅读原文 →</a><a href="https://news.ycombinator.com/item?id=49541256" target="_blank" rel="noopener">讨论区 →</a></div>
+        
+      </article>
+      <article class="story"
+               data-source="hn" data-sid="hn-49551096">
+        <div class="kicker"><span class="n">02</span>
+          <span class="s">Hacker News</span>
+          <span>9月3日</span></div>
+        <h3 class="hl"><a href="https://news.ycombinator.com/item?id=49551096" target="_blank"
+          rel="noopener">Ask HN: Why were OpenAI, Claude, and Grok simultaneously down?</a></h3>
+        <div class="meta">330 票<span class="sep">·</span>527 评论<span class="sep">·</span>9月3日<span class="sep">·</span>10 小时前<span class="sep">·</span>得分 0.960</div>
+        <p class="sum">一条 Ask HN 追问：为什么 OpenAI、Claude 与 Grok 在同一时段集体不可用。三家的状态页与三个独立的故障讨论帖被并列贴出，但当时官方状态页尚未反映。评论区最被认可的猜测是与当天 Astra 发布带来的流量有关，并非巧合；也有人报告连开发者账号都登不上。527 条评论里更多是「先回去用纸笔」这类调侃。</p>
+        <div class="links"><a href="https://news.ycombinator.com/item?id=49551096" target="_blank" rel="noopener">讨论区 →</a></div>
+        
+      </article>
+      <article class="story"
+               data-source="hn" data-sid="hn-49537131">
+        <div class="kicker"><span class="n">03</span>
+          <span class="s">Hacker News</span>
+          <span>9月2日</span></div>
+        <h3 class="hl"><a href="https://news.ycombinator.com/item?id=49537131" target="_blank"
+          rel="noopener">Google avoids a breakup of its ad tech business</a></h3>
+        <div class="meta">465 票<span class="sep">·</span>347 评论<span class="sep">·</span>9月2日<span class="sep">·</span>1 天前<span class="sep">·</span>得分 0.959</div>
+        <p class="sum">NYT 报道：Google 在广告技术反垄断案中避免了被拆分。评论区普遍失望，认为这是又一次「赚够了钱、打点够了政客就没事」的结局，也有人指出 Google 在法庭上历来胜多败少。但也有更冷静的补充：翻了司法部的公告后认为救济措施并非一无所有，只是远谈不上有力。**原文有付费墙，正文未能获取**，本条依据 347 条讨论与其中的司法部公告链接写成。</p>
+        <div class="links"><a href="https://www.nytimes.com/2026/09/02/technology/google-ad-tech-remedies.html" target="_blank" rel="noopener">阅读原文 →</a><a href="https://news.ycombinator.com/item?id=49537131" target="_blank" rel="noopener">讨论区 →</a></div>
+        
+      </article>
+      <article class="story"
+               data-source="hn" data-sid="hn-49520022">
+        <div class="kicker"><span class="n">04</span>
+          <span class="s">Hacker News</span>
+          <span>9月1日</span></div>
+        <h3 class="hl"><a href="https://news.ycombinator.com/item?id=49520022" target="_blank"
+          rel="noopener">AnkiDroid: Google Play no longer allowing Open Collective donation link</a></h3>
+        <div class="meta">917 票<span class="sep">·</span>279 评论<span class="sep">·</span>9月1日<span class="sep">·</span>2 天前<span class="sep">·</span>得分 0.959</div>
+        <p class="sum">AnkiDroid 的 GitHub 议题：自 8 月 28 日起 Google Play 开始驳回其指向 Open Collective 的捐赠链接。项目方需要 Google 澄清一件事——IRS 的 501(c)(6) 认定是否满足「免税捐赠」的要求。917 票，是这批里票数最高的条目之一。评论区一边讨论 Play 结算规则的边界，一边有人因这条帖子想起该去给 AnkiDroid 捐款。</p>
+        <div class="links"><a href="https://github.com/ankidroid/Anki-Android/issues/21656" target="_blank" rel="noopener">阅读原文 →</a><a href="https://news.ycombinator.com/item?id=49520022" target="_blank" rel="noopener">讨论区 →</a></div>
+        
+      </article>
+      <article class="story"
+               data-source="hn" data-sid="hn-49550614">
+        <div class="kicker"><span class="n">05</span>
+          <span class="s">Hacker News</span>
+          <span>9月3日</span></div>
+        <h3 class="hl"><a href="https://news.ycombinator.com/item?id=49550614" target="_blank"
+          rel="noopener">ChatGPT outage – Resolved</a></h3>
+        <div class="meta">361 票<span class="sep">·</span>316 评论<span class="sep">·</span>9月3日<span class="sep">·</span>11 小时前<span class="sep">·</span>得分 0.949</div>
+        <p class="sum">ChatGPT 服务中断，后标记为已恢复。原页面只有产品介绍，没有事故说明，实质信息全在 316 条讨论里：Codex 同时受影响，VS Code 里的 Codex 返回 404。这条与同期的 Claude、Grok 故障帖构成了当天的连锁事件。**官方未能获取任何事故复盘正文**，本条依据 HN 讨论中的一手报告写成。</p>
+        <div class="links"><a href="https://chatgpt.com/" target="_blank" rel="noopener">阅读原文 →</a><a href="https://news.ycombinator.com/item?id=49550614" target="_blank" rel="noopener">讨论区 →</a></div>
+        
+      </article></div>
+    </section>
+  <footer><h4>编者按 · Editor&rsquo;s Note</h4><p>本期排名只使用各平台<strong>原生公开的真实计数</strong>：评论量（权重 0.5）、转发量（0.3，仅 Reddit 公开）、点赞或票数（0.2）。某信源缺某项指标时，其权重按比例分配给该信源可得的指标。「点击率」在四个信源中全部不公开，因此不参与排名，也不出现在本页任何数字中。</p><p>各指标先在<strong>同信源同窗口</strong>的候选池内换算成分位值（0~1）再加权求和。用分位而非极值归一，是因为互动数据呈重尾分布，极值归一会被单个爆款压平中段。得分只在同信源内可比，因此版块内先按信源优先级排列，再按组内得分降序 —— 不做跨平台的分数比较。</p><p>名额固定：七日要闻 HN 4 / Reddit 3 / HF 2 / dev.to 1，三日速览 2/1/1/1，另设 Hacker News 专属三日专栏 5 条。某信源不足额时，空缺按 HN → Reddit → HF → dev.to <strong>轮流各补一席</strong>，而非让最高优先级的一家吃满 —— 否则某个信源缺席时版面会被单一平台压倒。三个版块之间不重复选取同一条目。</p><p>数据来源：<strong>Hacker News</strong>：points&gt;20 的 story；<strong>r/LocalLLaMA</strong>：打印版 PDF 还原：解析 100 条，核心字段完整 99 条；<strong>Hugging Face Papers</strong>：2 天无日报(周末/尚未发布)；<strong>DEV Community</strong>：全站热榜 top=7 + top=3。</p><p>报头下的频道条可按信源筛选，序号与头条随所选频道重排；链接末尾的 <code>#ch=hn</code> 之类可直接落到指定频道。禁用 JavaScript 时频道条隐藏，全部条目照常显示。</p><p>生成时间 2026-09-04T09:50:30+08:00　·　HN 候选门槛 <code>points &gt; 20</code>　·　排名口径全文见 <code>references/ranking.md</code></p></footer>
+</div>
+<noscript><style>.channels{display:none}</style></noscript>
+<script>
+(function(){
+  var body=document.body, btns=[].slice.call(document.querySelectorAll('.ch'));
+  function cols(grid){
+    var t=getComputedStyle(grid).gridTemplateColumns;
+    return t ? t.split(' ').filter(Boolean).length : 1;
+  }
+  var cur='all';
+  function apply(ch){
+    cur=ch; body.setAttribute('data-ch', ch);
+    btns.forEach(function(b){b.classList.toggle('on', b.dataset.ch===ch)});
+    [].forEach.call(document.querySelectorAll('section[data-sec]'), function(s){
+      var grid=s.querySelector('.grid'), all=grid?[].slice.call(
+        grid.querySelectorAll('.story')):[];
+      var vis=all.filter(function(a){
+        return ch==='all' || a.getAttribute('data-source')===ch;});
+      s.hidden = vis.length===0;                       // 空版块整块收起，不留空壳标题
+      all.forEach(function(a){a.classList.remove('is-lead');a.removeAttribute('data-col')});
+      if(!vis.length) return;                          // 先清干净再返回，不留陈旧状态
+      var n=cols(grid);
+      vis.forEach(function(a,i){
+        // 序号与头条都跟着当前视图走；列位自己算，nth-child 在过滤后会错位
+        a.querySelector('.kicker .n').textContent=('0'+(i+1)).slice(-2);
+        if(i===0){a.classList.add('is-lead');return;}
+        var c=(i-1)%n;
+        a.setAttribute('data-col', c===0 ? '0' : (c===n-1 ? 'last' : String(c)));
+      });
+    });
+    try{history.replaceState(null,'','#ch='+ch)}catch(e){}
+  }
+  btns.forEach(function(b){
+    if(!b.disabled) b.addEventListener('click', function(){apply(b.dataset.ch)});
+  });
+  var t;
+  addEventListener('resize', function(){       // 断点变化会改列数，重排列位
+    clearTimeout(t); t=setTimeout(function(){apply(cur)}, 150);
+  });
+  var m=/[#&]ch=([a-z]+)/i.exec(location.hash), want=m && m[1].toLowerCase();
+  apply(want && document.querySelector('.ch[data-ch="'+want+'"]:not(:disabled)')
+        ? want : 'all');
+})();
+</script>
+</body>
+</html>
