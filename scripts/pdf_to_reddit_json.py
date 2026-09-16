@@ -16,6 +16,7 @@ NVIDIA 会被解成 NVI输IA，因为多个字体在同一码位上有不同字�
 from __future__ import annotations
 
 import argparse
+import collections
 import html
 import json
 import re
@@ -49,25 +50,44 @@ def parse_objects(raw):
     return objs
 
 
-def _utf16(hexs):
+def _utf16(raw):
     """ToUnicode 的目标值是 UTF-16BE；逐 4 位 chr() 会把代理对拆成孤立代理。"""
     try:
-        return bytes.fromhex(hexs.decode()).decode("utf-16-be")
+        b = raw if isinstance(raw, (bytes, bytearray)) else bytes.fromhex(raw)
+        return bytes(b).decode("utf-16-be")
     except Exception:                                # noqa: BLE001
         return "�"
+
+
+def _bump(base_hex, i):
+    """bfrange 的目标值按 UTF-16 **码元**递增。直接 int(dst)+i 会在代理对上溢出码点上限。"""
+    b = bytearray(bytes.fromhex(base_hex))
+    if len(b) < 2:
+        return _utf16(b)
+    b[-2:] = ((int.from_bytes(b[-2:], "big") + i) & 0xFFFF).to_bytes(2, "big")
+    return _utf16(b)
 
 
 def parse_cmap(data):
     cm = {}
     for blk in re.findall(rb"beginbfchar(.*?)endbfchar", data, re.S):
         for src, dst in re.findall(rb"<([0-9A-Fa-f]+)>\s*<([0-9A-Fa-f]+)>", blk):
-            cm[int(src, 16)] = _utf16(dst)
+            cm[int(src, 16)] = _utf16(dst.decode())
     for blk in re.findall(rb"beginbfrange(.*?)endbfrange", data, re.S):
+        # 形式一：<lo> <hi> <dst>，目标按码元连续递增
         for lo, hi, dst in re.findall(
                 rb"<([0-9A-Fa-f]+)>\s*<([0-9A-Fa-f]+)>\s*<([0-9A-Fa-f]+)>", blk):
-            lo, hi, dst = int(lo, 16), int(hi, 16), int(dst, 16)
+            lo, hi = int(lo, 16), int(hi, 16)
+            if hi - lo > 0xFFFF:                     # 畸形区间，跳过而不是撑爆内存
+                continue
             for i, code in enumerate(range(lo, hi + 1)):
-                cm[code] = chr(dst + i)
+                cm[code] = _bump(dst.decode(), i)
+        # 形式二：<lo> <hi> [<d1> <d2> …]，逐个列出
+        for lo, hi, arr in re.findall(
+                rb"<([0-9A-Fa-f]+)>\s*<([0-9A-Fa-f]+)>\s*\[(.*?)\]", blk, re.S):
+            lo = int(lo, 16)
+            for i, dst in enumerate(re.findall(rb"<([0-9A-Fa-f]+)>", arr)):
+                cm[lo + i] = _utf16(dst.decode())
     return cm
 
 
@@ -104,16 +124,9 @@ def page_fonts(objs):
 LINE_GAP = 6        # 行距约 15；同一视觉行内 emoji 基线偏移远小于此
 
 
-def pdf_text(path):
-    raw = open(path, "rb").read()
-    objs = parse_objects(raw)
-    fcm = font_cmaps(objs)
-    if not fcm:
-        raise SystemExit("这个 PDF 里没有可解的 /ToUnicode 字体映射 —— 可能是扫描件或图片版")
-    body = max(fcm, key=lambda k: len(fcm[k]))       # 字形最多的即正文等宽字体
-    pf = page_fonts(objs)
-
-    rows = []
+def _page_segments(objs, fcm, pf):
+    """逐页取出 (y, x, 字体, 文本) 片段。"""
+    pages = []
     for cn in sorted(pf):
         data = objs[cn][1]
         if not data:
@@ -127,10 +140,39 @@ def pdf_text(path):
                 continue
             h, cm = m.group(4).decode(), fcm.get(cur, {})
             segs.append((float(m.group(3)), float(m.group(2)), cur,
-                         "".join(cm.get(int(h[i:i + 4], 16), "�")
+                         "".join(cm.get(int(h[i:i + 4], 16), "\ufffd")
                                  for i in range(0, len(h), 4))))
-        segs.sort(key=lambda s: (s[0], s[1]))
+        pages.append(segs)
+    return pages
 
+
+def chrome_fonts(pages, body):
+    """识别打印页眉页脚（及 JSON 查看器的「美观输出」标签）所用字体：每页都在，且总落在同几个
+    页内纵坐标上。Chrome 打印长页面时正文坐标跨页连续、页眉页脚却用页内坐标，于是页脚的 y
+    会落进后续页正文的 y 区间，按行过滤拦不住 —— 实测把 "num_comments": 22 拼成了 h2/1322。"""
+    pages_of, ys_of = collections.defaultdict(set), collections.defaultdict(set)
+    for i, segs in enumerate(pages):
+        for y, _, f, _ in segs:
+            if f != body:
+                pages_of[f].add(i)
+                ys_of[f].add(round(y))
+    n = max(len(pages), 1)
+    return {f for f in pages_of if len(pages_of[f]) >= n * 0.5 and len(ys_of[f]) <= 4}
+
+
+def pdf_text(path):
+    raw = open(path, "rb").read()
+    objs = parse_objects(raw)
+    fcm = font_cmaps(objs)
+    if not fcm:
+        raise SystemExit("这个 PDF 里没有可解的 /ToUnicode 字体映射 —— 可能是扫描件或图片版")
+    body = max(fcm, key=lambda k: len(fcm[k]))       # 字形最多的即正文等宽字体
+    pages = _page_segments(objs, fcm, page_fonts(objs))
+    chrome = chrome_fonts(pages, body)
+
+    rows = []
+    for segs in pages:
+        segs = sorted((s for s in segs if s[2] not in chrome), key=lambda s: (s[0], s[1]))
         line, last = [], None
         for s in segs:
             if last is not None and abs(s[0] - last) > LINE_GAP:
@@ -232,14 +274,36 @@ def to_listing(posts):
 
 # ---------------------------------------------------------------- 入口
 
+_UNESCAPE = ("title", "selftext", "url", "url_overridden_by_dest", "permalink")
+
+
 def convert(path):
-    """返回 (listing, 报告)。报告里如实记录条数与缺字段情况。"""
-    posts = extract_posts(pdf_text(path))
+    """返回 (listing, 报告)。先试整份 JSON 直接解析（压缩版原始 JSON 最保真），
+    不合法再回退字段级容错提取（美化版常因 emoji 等无字形字符断行而不完整）。"""
+    txt = pdf_text(path)
+    posts, method = None, "字段级容错提取"
+    try:
+        o = json.loads(txt[txt.find("{"): txt.rfind("}") + 1])
+        kids = ((o or {}).get("data") or {}).get("children") or []
+        if kids:
+            posts = []
+            for c in kids:
+                d = dict(c.get("data") or {})
+                for k in _UNESCAPE:                  # 与字段级路径一致：补齐 & 转义
+                    if isinstance(d.get(k), str):
+                        d[k] = html.unescape(d[k])
+                posts.append(d)
+            method = "整份 JSON 直接解析"
+    except (json.JSONDecodeError, AttributeError, TypeError):
+        pass
+    if posts is None:
+        posts = extract_posts(txt)
     good, bad = [], []
     for p in posts:
         miss = [k for k in CORE if p.get(k) in (None, "")]
         (bad if miss else good).append((p, miss))
     return to_listing([p for p, _ in good]), {
+        "method": method,
         "total": len(posts),
         "usable": len(good),
         "dropped": [{"title": (p.get("title") or "?")[:60], "missing": m} for p, m in bad],
@@ -255,7 +319,7 @@ def main():
     listing, rep = convert(args.pdf)
     kids = listing["data"]["children"]
 
-    log(f"解析 {rep['total']} 条，核心字段完整 {rep['usable']} 条")
+    log(f"解析 {rep['total']} 条（{rep['method']}），核心字段完整 {rep['usable']} 条")
     for d in rep["dropped"]:
         log(f"  ✗ 丢弃：{d['title']}  缺 {d['missing']}")
     now = datetime.now().timestamp()

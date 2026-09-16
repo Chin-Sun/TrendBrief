@@ -87,7 +87,7 @@ python3 <skill>/scripts/render_board.py board_data.json summaries.json \
 - **排名是全局连续的**：第 2 批显示第 31–60 名，不重新从 01 开始 —— 否则「往下翻」在页面上看不出来。
 - **摘要按批补**。未写摘要的条目显式标「摘要待补」，绝不用自动文本填充。补完摘要后用**同一文件路径**重新发布 Artifact，落回同一 URL，**用户的星标不受影响**（localStorage 按 artifact 地址隔离，重发布不清空）。
 - **收藏只在浏览器本地**。换设备、清站点数据、无痕窗口会丢；页面在沙箱里跑，无法存盘，所以备份面板只能复制粘贴，**不要做下载按钮 —— Artifact 沙箱会让它静默失效**。
-- 交互没有浏览器可测时，用 `node` + 最小 DOM 桩直接跑产物里的真实 JS（本仓库历史上用过 `boardtest.mjs` 的做法），务必覆盖 localStorage 抛异常的情形。
+- 交互没有浏览器可测时，跑 `node <skill>/scripts/boardtest.mjs <index.html>`：用最小 DOM 桩直接执行产物里的真实 JS，覆盖翻批、星标、重载恢复、导入与 localStorage 抛异常。
 
 ## 站点同步（每次渲染都要做）
 
@@ -106,6 +106,7 @@ python3 <skill>/scripts/render_html.py digest_data.json summaries.json \
 - `--site-out` 写的**始终是完整 HTML 文档**（`render_board.py` 默认输出的是 Artifact 片段，
   站点副本会自动补外壳）。片段直接当网页挂上去在部分浏览器里会出问题。
 - `--sibling "文本|href"` 生成两页互指的站内导航，别让读者掉进单页孤岛。
+- **临时目录会在会话之间被清空**（`summaries.json` 丢过）。别重写已有摘要，从已发布页面恢复：`index.html` 里 `<script id="summaries">` 就是完整 JSON；日报页每条 `article[data-sid]` 下的 `p.sum` 是正文。
 - 仓库根有 `.nojekyll`（跳过 Jekyll 构建），`Reddit/` 在 `.gitignore` 里 —— 那是取数输入，
   且仓库公开，不要把抓来的 Reddit 数据推上去。
 
@@ -134,7 +135,7 @@ Reddit 是四个信源里唯一封锁免鉴权访问的（`.json` 返回反爬 H
   python3 <skill>/scripts/pdf_to_reddit_json.py top.pdf -o reddit.json
   ```
 
-  已实测可用（10 条全部还原、核心字段无缺）。但要如实告诉用户两个限制：**打印时 `limit` 参数往往不生效，实测只得 10 条**，候选池比其他信源浅得多；标题末尾的 emoji 可能因无字形而丢失。字段缺失的条目会被丢弃并在 stderr 列出，**不静默补默认值**。
+  美化版与压缩版（取消勾选「美观输出」）两种打印格式都能还原，`limit=100` 打印时可以生效（实测 100 条中 99 条完整）。脚本先试整份 `json.loads`，不合法再回退字段级提取。要如实告诉用户：标题末尾的 emoji 可能因无字形被截断；字段缺失的条目会被丢弃并在 stderr 列出，**不静默补默认值**。
 
 - **模式 C · 跳过**：无凭证也无导出文件时自动降级。Reddit 的名额按优先级**轮转**分给其余信源，页面编者按显式说明「本期未采集」。**不要假装采到了。**
 
@@ -153,4 +154,5 @@ Reddit 是四个信源里唯一封锁免鉴权访问的（`.json` 返回反爬 H
 
 - HN Algolia 的 `>` 必须写成 `%3E`，裸 `>` 会被 shell 当重定向符。
 - HF 的 `papers/trending` 是**历史热门榜**：实测 50 条里仅 8 条在 7 天内、0 条在 3 天内。必须靠 `api/daily_papers?date=` 逐日补齐。daily_papers 周末不发布，逐日拉取遇到空日属正常。
+- Chrome 打印长页面时**正文坐标跨页连续、页眉页脚却用页内坐标**，页脚的 y 会落进后续页正文区间，被拼进正文（实测 `"num_comments": 22` 变成 `h2/1322`）。`chrome_fonts()` 按「过半页面都出现 + 固定纵坐标」识别页眉页脚字体并按字形剔除，别退回按行过滤。
 - 环境无 requests/bs4，全部走标准库。别 `pip install`。

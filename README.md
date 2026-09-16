@@ -2,12 +2,12 @@
 
 一条自然语言指令，换回一份带 200 字中文摘要、报纸风格排版的技术资讯页面。
 
-**在线访问**：https://chin-sun.github.io/TrendBrief/
+**在线访问**：https://subtle-clafoutis-df6797.netlify.app/
 
 | 页面 | 内容 |
 |---|---|
-| [`index.html`](https://chin-sun.github.io/TrendBrief/) | 🐮 **The Daily Bull** 新闻板 —— HN 与 HF Papers 近 7 天榜单切成等量批次，可往下翻、可星标收藏 |
-| [`digest.html`](https://chin-sun.github.io/TrendBrief/digest.html) | 📰 **The Daily Digest** 日报 —— 四信源固定 20 条，按时间窗口分版块，可按信源筛选 |
+| [`index.html`]| 🐮 **The Daily Bull** 新闻板 —— HN 与 HF Papers 近 7 天榜单切成等量批次，可往下翻、可星标收藏 |
+| [`digest.html`] | 📰 **The Daily Digest** 日报 —— 四信源固定 20 条，按时间窗口分版块，可按信源筛选 |
 
 ## 解决什么痛点
 
@@ -74,12 +74,14 @@
 3. **B-pdf · 打印版 PDF 还原** —— 若导出成了 PDF，`--reddit-json` 直接传 `.pdf` 即可，`pdf_to_reddit_json.py` 会还原成 listing。实测 100 条中 99 条核心字段完整。
 4. **C · 跳过** —— 名额轮转转移，页面编者按显式说明「本期未采集」。**不假装采到了。**
 
-### PDF 还原踩过的三个坑
+### PDF 还原踩过的坑
 
 - PDF 用**子集字体**存 CID 码（`<005E>` 才是 `{`），必须按对象图取**每个字体各自的** `/ToUnicode` CMap。合并成一张表会串码 —— 实测 `NVIDIA` 被解成 `NVI输IA`。
 - 判断页眉页脚要**按行而非按字体**：标题里的 emoji 用的也是非正文字体，按字体过滤会把标题截断。
 - 长值有**软换行**。JSON 美化输出每行必带缩进，故「不以空格开头的行」必是续行，据此重接。
 - `bfrange` 的目标值可能是代理对，按码元递增，直接 `int(dst)+i` 会溢出码点上限。
+- Chrome 打印长页面时**正文坐标跨页连续，页眉页脚却用页内坐标**，第 2 页起页脚的纵坐标会落进正文区间，被当成正文拼进去（实测 `"num_comments": 22` 变成 `h2/1322`）。改为按「过半页面都出现、且始终在固定纵坐标」识别页眉页脚字体，按字形剔除。
+- 取消勾选「美观输出」打出的压缩版 JSON 可以整份 `json.loads`，最保真；美化版会被标题末尾的 emoji 截断字符串，只能走字段级容错提取。
 
 ## 目录结构
 
