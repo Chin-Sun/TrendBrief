@@ -102,6 +102,21 @@
 
 两个渲染器都有 `--site-out PATH`，渲染时一并写入站点文件，**不靠事后手工复制**。
 
+## 本地模型写摘要（可选）
+
+不开 Claude 也能补摘要：`scripts/summarize_local.py` 调用本地 llama.cpp 的 `llama-server`（OpenAI 兼容接口），只补 `summaries.json` 里缺的条目，**已有摘要永不覆盖**。写作规范与 `SKILL.md` 第二段一致；输出不合格（非中文、过短过长、复述标题、空话）会带着原因重试一次，仍不合格就跳过，页面照常标「摘要待补」。本地模型写的条目记在 `.work/summaries_meta.json`，便于日后抽查或让 Claude 重写。
+
+```bash
+brew install llama.cpp
+llama-server -hf inclusionAI/Ling-3.0-tiny-GGUF:Q6_K \
+  -ngl 99 -c 16384 -np 1 -fa on --jinja --reasoning-budget 0 --port 8080   # 另开终端常驻
+
+./run.sh summarize --limit 3   # 试跑三条
+./run.sh all                   # 模型在线时 = 取数 + 写摘要 + 渲染；不在线则跳过写摘要
+```
+
+新闻板只有前 `--enrich-batches`（默认 2）批抓了正文，第 3 批起没有正文可依据，不会被补写。
+
 ## 前置条件
 
 - Python 3，**仅用标准库，无需 `pip install`**（环境无 requests/bs4，PDF 解析也是手写的 zlib + 正则）。

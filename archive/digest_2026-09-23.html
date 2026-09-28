@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>The Daily Digest · 2026年9月23日 星期三</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&display=swap"
+      rel="stylesheet">
+<style>
+:root{
+  --paper:#fff; --ink:#121212; --ink-soft:#2b2b2b; --muted:#6b6b6b;
+  --rule:#dcdcdc; --rule-strong:#121212; --accent:#326891; --tint:#f6f6f4;
+  --serif:"Songti SC","Noto Serif SC","Source Han Serif SC",Georgia,"Times New Roman",serif;
+  --head:Georgia,"Times New Roman","Songti SC","Noto Serif SC",serif;
+  --sans:"Helvetica Neue",Helvetica,Arial,"PingFang SC","Hiragino Sans GB",sans-serif;
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    --paper:#121212; --ink:#f2f2f2; --ink-soft:#e0e0e0; --muted:#9b9b9b;
+    --rule:#343434; --rule-strong:#f2f2f2; --accent:#83b4de; --tint:#1b1b1b;
+  }
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);
+     font-family:var(--serif);-webkit-font-smoothing:antialiased}
+a{color:inherit}
+.wrap{max-width:1180px;margin:0 auto;padding:0 26px 72px}
+
+/* ---------- 报头 ---------- */
+.masthead{padding-top:26px}
+.dateline{display:flex;justify-content:space-between;align-items:baseline;gap:16px;
+  font-family:var(--sans);font-size:11px;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--muted);border-bottom:1px solid var(--rule);padding-bottom:9px;flex-wrap:wrap}
+.nameplate{font-family:"UnifrakturMaguntia",Georgia,serif;font-weight:400;
+  font-size:clamp(40px,9vw,84px);line-height:1.05;text-align:center;
+  margin:20px 0 12px;letter-spacing:.01em}
+.tagline{text-align:center;font-family:var(--sans);font-size:11.5px;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--muted);padding-bottom:14px}
+.rule-double{border-top:3px double var(--rule-strong);margin-bottom:8px}
+
+/* ---------- 信源状态条 ---------- */
+.sources{display:flex;flex-wrap:wrap;gap:6px 22px;padding:11px 0 13px;
+  border-bottom:1px solid var(--rule);font-family:var(--sans);font-size:11.5px;color:var(--muted)}
+.sources b{color:var(--ink);font-weight:600;letter-spacing:.03em}
+.src-ok::before{content:"●";color:#2e7d4f;margin-right:6px;font-size:9px;vertical-align:2px}
+.src-off::before{content:"○";color:var(--muted);margin-right:6px;font-size:9px;vertical-align:2px}
+
+/* ---------- 频道切换 ---------- */
+.channels{display:flex;flex-wrap:wrap;gap:8px;padding:13px 0;
+  border-bottom:1px solid var(--rule)}
+.ch{font-family:var(--sans);font-size:11.5px;letter-spacing:.09em;text-transform:uppercase;
+  background:none;border:1px solid var(--rule);color:var(--muted);
+  padding:6px 13px;border-radius:2px;cursor:pointer;transition:none}
+.ch:hover:not(:disabled){border-color:var(--rule-strong);color:var(--ink)}
+.ch.on{background:var(--rule-strong);color:var(--paper);border-color:var(--rule-strong)}
+.ch:disabled{opacity:.45;cursor:not-allowed;text-decoration:line-through}
+.ch .c{font-family:var(--head);font-style:italic;text-transform:none;
+  letter-spacing:0;margin-left:5px}
+.sib{margin-left:auto;font-family:var(--sans);font-size:11.5px;letter-spacing:.09em;
+  text-transform:uppercase;color:var(--accent);text-decoration:none;
+  border-bottom:1px solid transparent;align-self:center}
+.sib:hover{border-bottom-color:var(--accent)}
+
+/* 频道过滤：body 无 data-ch（例如禁用 JS）时不匹配任何规则，全部条目照常显示 */
+body[data-ch="hn"]     .story:not([data-source="hn"]),
+body[data-ch="reddit"] .story:not([data-source="reddit"]),
+body[data-ch="hf"]     .story:not([data-source="hf"]),
+body[data-ch="devto"]  .story:not([data-source="devto"]){display:none}
+
+/* ---------- 版块 ---------- */
+section{margin-top:46px}
+.sec-head{display:flex;justify-content:space-between;align-items:baseline;gap:14px;
+  border-bottom:2px solid var(--rule-strong);padding-bottom:7px;flex-wrap:wrap}
+.sec-head h2{font-family:var(--head);font-size:25px;font-weight:700;margin:0;letter-spacing:.01em}
+.sec-head .k{font-family:var(--sans);font-size:10.5px;letter-spacing:.15em;
+  text-transform:uppercase;color:var(--muted)}
+
+/* ---------- 条目通用 ---------- */
+.kicker{font-family:var(--sans);font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;
+  color:var(--muted);margin-bottom:9px;display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.kicker .n{font-family:var(--head);font-size:13px;letter-spacing:0;color:var(--muted);
+  font-style:italic}
+.kicker .s{color:var(--ink);font-weight:700}
+h3.hl,h2.hl{font-family:var(--head);font-weight:700;margin:0 0 9px;letter-spacing:-.005em}
+.hl a{text-decoration:none}
+.hl a:hover{text-decoration:underline;text-underline-offset:3px}
+.meta{font-family:var(--sans);font-size:11.5px;color:var(--muted);margin-bottom:11px;
+  line-height:1.6}
+.meta .sep{opacity:.5;margin:0 6px}
+.sum{font-size:15px;line-height:1.78;color:var(--ink-soft);margin:0 0 13px;
+  text-align:justify;text-justify:inter-ideograph}
+.sum.missing{color:var(--muted);font-style:italic;text-align:left}
+.links{font-family:var(--sans);font-size:11.5px;letter-spacing:.04em;
+  display:flex;gap:16px;flex-wrap:wrap}
+.links a{color:var(--accent);text-decoration:none;border-bottom:1px solid transparent}
+.links a:hover{border-bottom-color:var(--accent)}
+.also{font-family:var(--sans);font-size:11px;color:var(--muted);margin-top:7px}
+
+/* ---------- 多栏网格 ---------- */
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:34px 0;padding-top:26px}
+.story{padding:0 26px;border-left:1px solid var(--rule)}
+.story h3.hl{font-size:19px;line-height:1.28}
+/* 无 JS 时的静态列位；有 JS 时由 data-col 覆盖（过滤后 nth-child 会错位） */
+.story:nth-child(3n+1){border-left:none;padding-left:0}
+.story:nth-child(3n){padding-right:0}
+.story[data-col]{border-left:1px solid var(--rule);padding-left:26px;padding-right:26px}
+.story[data-col="0"]{border-left:none;padding-left:0}
+.story[data-col="last"]{padding-right:0}
+
+/* ---------- 头条：由 class 控制，过滤后可换人 ---------- */
+.story.is-lead{grid-column:1/-1;border-left:none!important;
+  padding:0 0 24px!important;border-bottom:1px solid var(--rule);margin-bottom:2px}
+.story.is-lead h3.hl{font-size:clamp(27px,4.1vw,43px);line-height:1.13;margin-bottom:12px}
+.story.is-lead .sum{font-size:16px;line-height:1.8;column-count:2;column-gap:36px;
+  column-rule:1px solid var(--rule)}
+@media (max-width:900px){
+  .grid{grid-template-columns:repeat(2,1fr);gap:30px 0}
+  .story:nth-child(3n+1){border-left:1px solid var(--rule);padding-left:26px}
+  .story:nth-child(3n){padding-right:26px}
+  .story:nth-child(2n+1){border-left:none;padding-left:0}
+  .story:nth-child(2n){padding-right:0}
+  .story.is-lead .sum{column-count:1}
+}
+@media (max-width:620px){
+  .wrap{padding:0 18px 56px}
+  .grid{grid-template-columns:1fr;gap:0}
+  .story{border-left:none!important;padding:22px 0!important;
+         border-top:1px solid var(--rule)}
+  .story.is-lead{border-top:none;padding-top:4px!important}
+  .story:first-child{border-top:none;padding-top:4px!important}
+}
+
+/* ---------- 编者按 ---------- */
+footer{margin-top:58px;border-top:3px double var(--rule-strong);padding-top:20px}
+footer h4{font-family:var(--sans);font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--muted);margin:0 0 12px}
+footer p{font-size:13.5px;line-height:1.8;color:var(--muted);margin:0 0 10px;max-width:74ch}
+footer code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;
+  background:var(--tint);padding:1px 5px;border-radius:3px}
+.note-warn{border-left:3px solid var(--rule-strong);padding-left:14px;color:var(--ink-soft)}
+
+@media print{
+  body{background:#fff;color:#000}
+  .links,.channels{display:none}
+  section{break-inside:avoid}
+  .story{break-inside:avoid}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="masthead">
+    <div class="dateline">
+      <span>2026年9月23日 星期三</span>
+      <span>本期 20 条　·　信源 3/4 在线</span>
+      <span>采集于 10:18</span>
+    </div>
+    <h1 class="nameplate">The Daily Digest</h1>
+    <div class="tagline">四源技术热帖简报　·　排名依据平台原生计数</div>
+    <div class="rule-double"></div>
+    <div class="sources"><span class="src-ok"><b>Hacker News</b> 618 条候选</span><span class="src-off"><b>r/LocalLLaMA</b> 未采集：未配置 REDDIT_CLIENT_ID / REDDIT_CLIENT_SECRET</span><span class="src-ok"><b>Hugging Face Papers</b> 173 条候选</span><span class="src-ok"><b>DEV Community</b> 161 条候选</span></div>
+    <nav class="channels" role="tablist"><button class="ch on" data-ch="all" type="button">全部 <span class="c">20</span></button><button class="ch" data-ch="hn" type="button">Hacker News <span class="c">13</span></button><button class="ch" data-ch="reddit" type="button" disabled title="未配置 REDDIT_CLIENT_ID / REDDIT_CLIENT_SECRET">r/LocalLLaMA <span class="c">0</span></button><button class="ch" data-ch="hf" type="button">Hugging Face Papers <span class="c">4</span></button><button class="ch" data-ch="devto" type="button">DEV Community <span class="c">3</span></button><a class="sib" href="index.html">🐮 新闻板 →</a></nav>
+  </header>
+  
+    <section data-sec="d7">
+      <div class="sec-head"><h2>七日要闻</h2>
+        <span class="k">PAST 7 DAYS · TOP 10</span></div>
+      <div class="grid">
+      <article class="story is-lead"
+               data-source="hn" data-sid="hn-49764791">
+        <div class="kicker"><span class="n">01</span>
+          <span class="s">Hacker News</span>
+          <span>9月19日</span></div>
+        <h3 class="hl"><a href="https://news.ycombinator.com/item?id=49764791" target="_blank"
+          rel="noopener">AI-generated posters don’t have to be horrible</a></h3>
+        <div class="meta">1,872 票<span class="sep">·</span>950 评论<span class="sep">·</span>9月19日<span class="sep">·</span>3 天前<span class="sep">·</span>得分 1.000</div>
+        <p class="sum">作者不满社区活动海报被 ChatGPT 默认风格刷屏（村集市、啤酒节等），一看就是同一套模板，重复本身就令人厌烦。他亲自实验：先让 ChatGPT 做“春季集市”海报，结果仍是手工市集模板；再要求“完全不同的设计美学，把上一张当反面教材”，得到包豪斯几何现代风，效果明显好很多，随后又试了 Memphis、Designers Republic 等风格。结论是关键在于明确指定风格并主动要求偏离默认。评论区不买账：有人说十几种变体仍有 AI 的统一“味道”，问题是缺乏构想与想象力；也有人说糟糕作品多来自不愿投入精力的人，这种泛滥本身就像一个“AI 陷阱”。</p>
+        <div class="links"><a href="https://john.hartnup.uk/2026/06/07/ai-event-posters.html" target="_blank" rel="noopener">阅读原文 →</a><a href="https://news.ycombinator.com/item?id=49764791" target="_blank" rel="noopener">讨论区 →</a></div>
+        
+      </article>
+      <article class="story"
+               data-source="hn" data-sid="hn-49803892">
+        <div class="kicker"><span class="n">02</span>
+          <span class="s">Hacker News</span>
+          <span>9月23日</span></div>
+        <h3 class="hl"><a href="https://news.ycombinator.com/item?id=49803892" target="_blank"
+          rel="noopener">Claude Opus 5.5</a></h3>
+        <div class="meta">1,224 票<span class="sep">·</span>820 评论<span class="sep">·</span>9月23日<span class="sep">·</span>10 小时前<span class="sep">·</span>得分 0.996</div>
+        <p class="sum">Anthropic发布Claude 5.5系列首个模型Opus 5.5,主打性能对标上一代旗舰Fable 5.1、成本却比Opus 5低40%。官方称其在自动化行为审计中是迄今表现最好的模型,发布前经Frontier Design、METR等外部机构测试,更不容易采取难以撤销或越权的行动,对提示注入的抵抗力也优于Opus 5。性能方面,测试者一天内完成68万行代码迁移;在优化网页加载速度任务上40次里成功39次。定价上输入输出token分别降到4美元/20美元每百万token,缓存读取每百万token仅0.2美元,生成速度也提升超30%。因在生物、网络安全能力上已接近上一代最强模型门槛,Opus 5.5也随之启用同等级安全防护。评论区讨论热烈,有人关心是否影响Fable系列定位,也有人吐槽官网UI体验。</p>
+        <div class="links"><a href="https://www.anthropic.com/claude-opus-5-5" target="_blank" rel="noopener">阅读原文 →</a><a href="https://news.ycombinator.com/item?id=49803892" target="_blank" rel="noopener">讨论区 →</a></div>
+        <div class="also">另见 <a href="https://news.ycombinator.com/item?id=49803863">Hacker News</a></div>
+      </article>
+      <article class="story"
+               data-source="hn" data-sid="hn-49752056">
+        <div class="kicker"><span class="n">03</span>
+          <span class="s">Hacker News</span>
+          <span>9月18日</span></div>
+        <h3 class="hl"><a href="https://news.ycombinator.com/item?id=49752056" target="_blank"
+          rel="noopener">Microsoft exec called AI scraping &#x27;the largest theft of labor in human history&#x27;</a></h3>
+        <div class="meta">949 票<span class="sep">·</span>832 评论<span class="sep">·</span>9月18日<span class="sep">·</span>4 天前<span class="sep">·</span>得分 0.993</div>
+        <p class="sum">纽约时报诉 OpenAI 与微软的版权案（已三年）最新解封的文件显示：一名微软高管私下称 AI 抓取训练数据“等同于盗窃”，OpenAI 领导层也承认模型对出版商和记者构成“生存威胁”。诉状还称两家公司绕过付费墙、大规模抓取建库，并剥离了版权标识。TechCrunch 特别提醒，这些内容多来自时报自己的诉状，原始证据仍被封存，引文缺乏上下文。法律层面，法官目前总体倾向于认可“合理使用”。HN 评论情绪激烈：有人说这是“把全人类文化偷走再加价卖回”，也有人指出原作并未消失，愤怒的对象也许不是“偷窃”本身；更多人对结果不抱希望，觉得有钱者可以买到司法。</p>
+        <div class="links"><a href="https://techcrunch.com/2026/09/17/microsoft-exec-called-ai-scraping-the-largest-theft-of-labor-in-human-history-new-unredacted-filings-reveal/" target="_blank" rel="noopener">阅读原文 →</a><a href="https://news.ycombinator.com/item?id=49752056" target="_blank" rel="noopener">讨论区 →</a></div>
+        <div class="also">另见 <a href="https://news.ycombinator.com/item?id=49748529">Hacker News</a></div>
+      </article>
+      <article class="story"
+               data-source="hn" data-sid="hn-49758736">
+        <div class="kicker"><span class="n">04</span>
+          <span class="s">Hacker News</span>
+          <span>9月19日</span></div>
+        <h3 class="hl"><a href="https://news.ycombinator.com/item?id=49758736" target="_blank"
+          rel="noopener">Android 17 is the first since 3.x to add new APIs without releasing to the AOSP</a></h3>
+        <div class="meta">1,178 票<span class="sep">·</span>720 评论<span class="sep">·</span>9月19日<span class="sep">·</span>4 天前<span class="sep">·</span>得分 0.992</div>
+        <p class="sum">GrapheneOS 指出，Android 17 QPR1 是自 Android 3.x 以来首个新增 API 却没有向 AOSP 发布源码的版本。（帖子正文未能完整获取，以下依据标题与评论区。）评论中有人补充关键细节：问题不在于新 API 只限 Pixel，而是每年第一个与第三个季度版本的补丁都只面向 Pixel。社区借此批评谷歌一步步收紧开源：延迟上游源码、安全公告禁运、认证限制等，GrapheneOS 等第三方 ROM 因此受阻。有人担心开发者最终只针对 Android 16 API 开发、Play 商店与 Pixel 地位下降，也有人质疑 AOSP 外部贡献者本来就极少，上游几乎只有谷歌自己。</p>
+        <div class="links"><a href="https://grapheneos.social/@GrapheneOS/117282080803799576" target="_blank" rel="noopener">阅读原文 →</a><a href="https://news.ycombinator.com/item?id=49758736" target="_blank" rel="noopener">讨论区 →</a></div>
+        
+      </article>
+      <article class="story"
+               data-source="hn" data-sid="hn-49753211">
+        <div class="kicker"><span class="n">05</span>
+          <span class="s">Hacker News</span>
+          <span>9月18日</span></div>
+        <h3 class="hl"><a href="https://news.ycombinator.com/item?id=49753211" target="_blank"
+          rel="noopener">I don&#x27;t like passkeys</a></h3>
+        <div class="meta">848 票<span class="sep">·</span>811 评论<span class="sep">·</span>9月18日<span class="sep">·</span>4 天前<span class="sep">·</span>得分 0.991</div>
+        <p class="sum">作者认为 Passkey 很适合企业环境，却不适合个人：它能防钓鱼、服务器泄露也无法还原私钥，但个人更大的风险是永久锁死账号、被自动封号和丢设备。他指出，若保留短信、邮件等恢复途径，安全性仍取决于最弱的一环；若不保留，就有永久失去账号的风险。硬件密钥上的 passkey 无法备份，只能为每个网站给 2–3 把密钥各登记一遍，成本高且不好扩展，可发现凭据还有 25–100 个的容量上限。评论区多数附和：说明不清、系统界面过度推销（Amazon、PayPal 被点名），被批评为“换不了的密码”和巨头的生态围墙，也有人说它的主要作用是让公司在泄露时能说“密码没丢”。</p>
+        <div class="links"><a href="https://hawksley.dev/blog/i-dont-like-passkeys" target="_blank" rel="noopener">阅读原文 →</a><a href="https://news.ycombinator.com/item?id=49753211" target="_blank" rel="noopener">讨论区 →</a></div>
+        
+      </article>
+      <article class="story"
+               data-source="hf" data-sid="hf-2609.18323">
+        <div class="kicker"><span class="n">06</span>
+          <span class="s">Hugging Face Papers</span>
+          <span>9月18日</span></div>
+        <h3 class="hl"><a href="https://huggingface.co/papers/2609.18323" target="_blank"
+          rel="noopener">Can MiniMax-H3 Reason About the Physical World? An Evaluation of Omni-Modal Generative Model</a></h3>
+        <div class="meta">112 票<span class="sep">·</span>5 评论<span class="sep">·</span>9月18日<span class="sep">·</span>5 天前<span class="sep">·</span>得分 0.980</div>
+        <p class="sum">这篇工作评测全模态生成模型 MiniMax-H3 能否推理物理世界。作者认为现有视频生成/世界模型评测输入模态单一、提示词几乎等同目标视频，于是设计四类任务：多帧配隐式提示、音频加图像、前缀视频、音视频输入，每种单一模态只给出部分证据，模型必须整合互补线索来推断潜在事件状态和未来动态。在 517 个测试实例上 MiniMax-H3 总成功率仅 41.97%，基于视频的决策推理最高（56.00%），基于音频的消歧推理最弱（27.40%）。结论是多模态整合仍是发挥全模态模型优势的关键短板，项目代码已在 GitHub 公开。</p>
+        <div class="links"><a href="https://arxiv.org/abs/2609.18323" target="_blank" rel="noopener">阅读原文 →</a><a href="https://huggingface.co/papers/2609.18323" target="_blank" rel="noopener">讨论区 →</a></div>
+        
+      </article>
+      <article class="story"
+               data-source="hf" data-sid="hf-2609.20511">
+        <div class="kicker"><span class="n">07</span>
+          <span class="s">Hugging Face Papers</span>
+          <span>9月18日</span></div>
+        <h3 class="hl"><a href="https://huggingface.co/papers/2609.20511" target="_blank"
+          rel="noopener">When EOS Tokens Disagree: Understanding Length Inflation in On-Policy Distillation</a></h3>
+        <div class="meta">106 票<span class="sep">·</span>5 评论<span class="sep">·</span>9月18日<span class="sep">·</span>5 天前<span class="sep">·</span>得分 0.973</div>
+        <p class="sum">探讨在策略蒸馏中学生模型输出为何会异常变长、甚至耗尽生成预算的问题。作者在Qwen3、Llama、Gemma三个模型家族上发现,学生和教师模型即便声明的终止符集合相同,实际分配停止概率的具体EOS token却可能不同,这种终止符错配会压制学生本身倾向的停止动作,却没能可靠传递教师偏好的终止方式。团队发现只对齐解码停止符集合还不够,必须把功能等价的EOS token当作同一语义停止动作处理,才能显著缓解三个模型家族的长度膨胀;训练过程中终止偏好还会持续漂移,团队已开源实现。</p>
+        <div class="links"><a href="https://arxiv.org/abs/2609.20511" target="_blank" rel="noopener">阅读原文 →</a><a href="https://huggingface.co/papers/2609.20511" target="_blank" rel="noopener">讨论区 →</a></div>
+        
+      </article>
+      <article class="story"
+               data-source="hf" data-sid="hf-2609.17488">
+        <div class="kicker"><span class="n">08</span>
+          <span class="s">Hugging Face Papers</span>
+          <span>9月17日</span></div>
+        <h3 class="hl"><a href="https://huggingface.co/papers/2609.17488" target="_blank"
+          rel="noopener">LimiX-2: A Contextual Mechanism Network Towards General Structured-Data Intelligence</a></h3>
+        <div class="meta">638 票<span class="sep">·</span>4 评论<span class="sep">·</span>9月17日<span class="sep">·</span>6 天前<span class="sep">·</span>得分 0.951</div>
+        <p class="sum">LimiX 系列的新一代表格/结构化数据基础模型论文。核心创新是提出上下文机制网络(CMN)范式,用上下文条件掩码建模预训练,把建模目标从传统表格模型的预测目标变量转为联合建模数据生成背后的因果结构;预训练数据来自结构因果模型生成的合成数据,涵盖多样图结构和观测过程。在TabArena、TALENT、BCCO等基准上超过现有数据集专用模型和表格基础模型,且因注意力机制直接编码因果关系,还能较准确还原变量间的因果骨架,把预测和因果发现结合到一个模型里,项目已开源并获4000+星。</p>
+        <div class="links"><a href="https://arxiv.org/abs/2609.17488" target="_blank" rel="noopener">阅读原文 →</a><a href="https://huggingface.co/papers/2609.17488" target="_blank" rel="noopener">讨论区 →</a></div>
+        
+      </article>
+      <article class="story"
+               data-source="devto" data-sid="dv-4626365">
+        <div class="kicker"><span class="n">09</span>
+          <span class="s">DEV Community</span>
+          <span>9月17日</span></div>
+        <h3 class="hl"><a href="https://dev.to/gramli/api-performance-testing-how-to-design-realistic-tests-59gn" target="_blank"
+          rel="noopener">API Performance Testing: How to Design Realistic Tests</a></h3>
+        <div class="meta">114 票<span class="sep">·</span>69 评论<span class="sep">·</span>9月17日<span class="sep">·</span>5 天前<span class="sep">·</span>得分 0.998</div>
+        <p class="sum">一篇 DEV Community 教程,系统讲解 API 性能测试方法论:先区分负载测试、压力测试、峰值测试等类型,再讨论如何依据真实流量模式(而非凭空造数)设定预期负载、如何处理测试环境里的外部依赖服务、测试环境应在多大程度上贴近生产环境,最后给出解读指标结果的思路。核心观点是性能测试的目标不是打出尽量多的请求,而是要让结果真正反映应用在真实场景下的表现,否则数据好看却无意义,甚至会误导发布决策,适合准备上线前压测但缺系统方法的团队参考。</p>
+        <div class="links"><a href="https://dev.to/gramli/api-performance-testing-how-to-design-realistic-tests-59gn" target="_blank" rel="noopener">讨论区 →</a></div>
+        
+      </article>
+      <article class="story"
+               data-source="devto" data-sid="dv-4702045">
+        <div class="kicker"><span class="n">10</span>
+          <span class="s">DEV Community</span>
+          <span>9月21日</span></div>
+        <h3 class="hl"><a href="https://dev.to/sylwia-lask/what-if-your-ai-agent-never-had-to-leave-the-browser-demo--5g" target="_blank"
+          rel="noopener">What If Your AI Agent Never Had to Leave the Browser? (Demo 🚀)</a></h3>
+        <div class="meta">95 票<span class="sep">·</span>62 评论<span class="sep">·</span>9月21日<span class="sep">·</span>1 天前<span class="sep">·</span>得分 0.990</div>
+        <p class="sum">作者是曾在 AGNTCon + MCPCon Europe 就 WebMCP 做过分享的开发者，本文是那次演讲后的后续文章。WebMCP 是一个实验性的浏览器 API，允许网站显式暴露工具供 AI 智能体调用，理念是让 AI 智能体无需离开浏览器就能完成任务。作者提到三个月前写过一篇同主题文章，但在“智能体 AI”领域发展飞快，当时的语法已经过时，因此写这篇更新版本，并计划做实机演示。文章偏个人博客随笔性质，抓取到的正文以背景介绍为主，具体的 WebMCP 用法演示和代码细节未在抓取范围内。</p>
+        <div class="links"><a href="https://dev.to/sylwia-lask/what-if-your-ai-agent-never-had-to-leave-the-browser-demo--5g" target="_blank" rel="noopener">讨论区 →</a></div>
+        
+      </article></div>
+    </section>
+    <section data-sec="d3">
+      <div class="sec-head"><h2>三日速览</h2>
+        <span class="k">PAST 3 DAYS · TOP 5</span></div>
+      <div class="grid">
+      <article class="story is-lead"
+               data-source="hn" data-sid="hn-49805509">
+        <div class="kicker"><span class="n">01</span>
+          <span class="s">Hacker News</span>
+          <span>9月23日</span></div>
+        <h3 class="hl"><a href="https://news.ycombinator.com/item?id=49805509" target="_blank"
+          rel="noopener">GPT-6 Sol and Luna</a></h3>
+        <div class="meta">1,202 票<span class="sep">·</span>614 评论<span class="sep">·</span>9月23日<span class="sep">·</span>8 小时前<span class="sep">·</span>得分 0.993</div>
+        <p class="sum">OpenAI在推出旗舰模型GPT-6 Astra之后,又发布了性价比更高的GPT-6 Sol和Luna,用同样技术方法把Astra的编程、事实性、电脑操作能力下放到更快更便宜的档位,并把API价格在GPT-5.6促销价基础上再降50%。官方数据显示:测试业务流程自动化能力的AutomationBench上,xhigh强度的Sol在成本仅为Opus 5 max强度9%的情况下反超后者;high强度的Luna相比上一代提升5.4个百分点,成本还降低58%;复杂专业工作流评测Agents&#x27; Last Exam上,max强度的Sol拿到56.4%,超过Opus 5最高分且成本低60%。评论区普遍认可这轮全行业降价潮,也注意到发布时间恰好与Anthropic Opus 5.5同一天。</p>
+        <div class="links"><a href="https://openai.com/index/introducing-gpt-6-sol-and-luna/" target="_blank" rel="noopener">阅读原文 →</a><a href="https://news.ycombinator.com/item?id=49805509" target="_blank" rel="noopener">讨论区 →</a></div>
+        
+      </article>
+      <article class="story"
+               data-source="hn" data-sid="hn-49797982">
+        <div class="kicker"><span class="n">02</span>
+          <span class="s">Hacker News</span>
+          <span>9月22日</span></div>
+        <h3 class="hl"><a href="https://news.ycombinator.com/item?id=49797982" target="_blank"
+          rel="noopener">I said no and Apple said yes</a></h3>
+        <div class="meta">796 票<span class="sep">·</span>646 评论<span class="sep">·</span>9月22日<span class="sep">·</span>18 小时前<span class="sep">·</span>得分 0.992</div>
+        <p class="sum">一篇愤怒的个人博客,记录作者如何在macOS一路升级过程中被反复重新开启Apple Intelligence相关功能。作者早在macOS 15.3就发现Siri相关功能每15分钟往外发个人数据,当时手动关闭;这次升级到macOS 27后发现原本用来关闭该功能的开关被直接移除,即便开关本身已关闭,后台仍有多个杀不死的Siri进程持续占用内存并写入数据。作者还吐槽升级后硬盘凭空多出22.28GB的相关文件,按新款MacBook按TB计费的存储价格换算相当于被多收了十几英镑。文章把矛头指向整个AI行业普遍缺乏同意机制。评论区两派分化明显:一部分人认为用闭源系统就别指望完全控制权,另一部分认为这篇情绪化但戳中要害。</p>
+        <div class="links"><a href="https://dbushell.com/2026/09/22/apple-intelligence/" target="_blank" rel="noopener">阅读原文 →</a><a href="https://news.ycombinator.com/item?id=49797982" target="_blank" rel="noopener">讨论区 →</a></div>
+        
+      </article>
+      <article class="story"
+               data-source="hn" data-sid="hn-49780820">
+        <div class="kicker"><span class="n">03</span>
+          <span class="s">Hacker News</span>
+          <span>9月21日</span></div>
+        <h3 class="hl"><a href="https://news.ycombinator.com/item?id=49780820" target="_blank"
+          rel="noopener">What happened to the Snowden archive</a></h3>
+        <div class="meta">714 票<span class="sep">·</span>570 评论<span class="sep">·</span>9月21日<span class="sep">·</span>2 天前<span class="sep">·</span>得分 0.983</div>
+        <p class="sum">作者梳理了斯诺登档案的公开时间线：《卫报》2014年2月、《明镜》2015年1月、《纽约时报》和 ProPublica 2015年8月相继停止刊发文件，此后只剩《拦截》（The Intercept）仍在发布，直到2019年3月关闭档案库；11周后的2019年5月29日，它发布了迄今最后一批文件。自那以后，再没有任何媒体、记者或机构公开过斯诺登档案中的新文件。文章还回顾了斯诺登最初联系格伦·格林沃尔德未果、转而联系劳拉·柏翠丝并与调查记者巴顿·盖尔曼合作、通过加密文件和邮寄硬盘逐步交接材料的过程。HN 评论气氛复杂：有人感慨舆论的“奥弗顿之窗”已经把当年的丑闻正常化了；也有人怀疑2026年再谈这类话题本身可能是钓鱼诱饵；还有人拿爱泼斯坦文件类比，认为当局只需等舆论自己冷却即可。</p>
+        <div class="links"><a href="https://libroot.org/posts/what-happened-to-the-snowden-archive" target="_blank" rel="noopener">阅读原文 →</a><a href="https://news.ycombinator.com/item?id=49780820" target="_blank" rel="noopener">讨论区 →</a></div>
+        
+      </article>
+      <article class="story"
+               data-source="hf" data-sid="hf-2609.24984">
+        <div class="kicker"><span class="n">04</span>
+          <span class="s">Hugging Face Papers</span>
+          <span>9月22日</span></div>
+        <h3 class="hl"><a href="https://huggingface.co/papers/2609.24984" target="_blank"
+          rel="noopener">WorldCrafter: Consistent Video World Model with Implicit 3D-aware Memory</a></h3>
+        <div class="meta">113 票<span class="sep">·</span>4 评论<span class="sep">·</span>9月22日<span class="sep">·</span>1 天前<span class="sep">·</span>得分 0.969</div>
+        <p class="sum">提出视频世界模型WorldCrafter,解决现有模型在长时间探索和跨视角场景下记不住之前看到内容的问题。核心思路是学习一个可按相机视角查询的隐式3D感知记忆:让目标视角决定如何把历史多视角信息压缩进视频生成器有限的token预算,由联合训练的记忆编码器和姿态条件读出模块,在去噪前整合成固定数量的视角专属token,全程不需要显式深度对应关系。配合近期时序上下文和少步蒸馏,WorldCrafter支持只用一张图或一句文本提示就进行分钟级流式场景探索,实验中长程一致性和相机控制精度都有明显提升,同时不牺牲画质。</p>
+        <div class="links"><a href="https://arxiv.org/abs/2609.24984" target="_blank" rel="noopener">阅读原文 →</a><a href="https://huggingface.co/papers/2609.24984" target="_blank" rel="noopener">讨论区 →</a></div>
+        
+      </article>
+      <article class="story"
+               data-source="devto" data-sid="dv-4713279">
+        <div class="kicker"><span class="n">05</span>
+          <span class="s">DEV Community</span>
+          <span>9月22日</span></div>
+        <h3 class="hl"><a href="https://dev.to/xulingfeng/two-weeks-in-a-15-year-qa-veteran-back-to-being-the-new-guy-39g3" target="_blank"
+          rel="noopener">Two Weeks In: A 15-Year QA Veteran, Back to Being the New Guy</a></h3>
+        <div class="meta">72 票<span class="sep">·</span>51 评论<span class="sep">·</span>9月22日<span class="sep">·</span>19 小时前<span class="sep">·</span>得分 0.986</div>
+        <p class="sum">一位有15年测试经验、做到测试管理岗位的工程师,被裁员后经朋友引荐加入一家AI Agent创业公司重新从头做测试,记录入职两周的心态调整。他发现新公司的产品到上线流程与过去习惯的模式完全不同,一度以为混乱,后来意识到只是不同而非更差;同时新环境给测试人员更多独立判断和思考时间,让他重新体会欲速则不达。文章还提到自己此前写的寓言系列里虚构的一个因AI被裁员的角色,与自己现实处境形成巧合互文,读来五味杂陈,整体是一篇关于职业转型与AI冲击测试行业的个人反思。</p>
+        <div class="links"><a href="https://dev.to/xulingfeng/two-weeks-in-a-15-year-qa-veteran-back-to-being-the-new-guy-39g3" target="_blank" rel="noopener">讨论区 →</a></div>
+        
+      </article></div>
+    </section>
+    <section data-sec="hn3">
+      <div class="sec-head"><h2>Hacker News 专栏</h2>
+        <span class="k">HACKER NEWS · PAST 3 DAYS · TOP 5</span></div>
+      <div class="grid">
+      <article class="story is-lead"
+               data-source="hn" data-sid="hn-49792730">
+        <div class="kicker"><span class="n">01</span>
+          <span class="s">Hacker News</span>
+          <span>9月22日</span></div>
+        <h3 class="hl"><a href="https://news.ycombinator.com/item?id=49792730" target="_blank"
+          rel="noopener">MiMo v2.6</a></h3>
+        <div class="meta">1,096 票<span class="sep">·</span>472 评论<span class="sep">·</span>9月22日<span class="sep">·</span>1 天前<span class="sep">·</span>得分 0.981</div>
+        <p class="sum">小米发布的MiMo-V2.6系列大模型,主打前沿智能、全模态覆盖、公开过程。官方页面本身信息简略,但根据HN热烈讨论,亮点包括展示模型使用DAW等多样化任务的能力、公布多组跑分和不同价位区间的性价比对比图,以及科研场景的实际应用案例。评论区一方面调侃中国实验室开始擅长包装发布会、护城河变薄了,另一方面有开发者实测称在OpenRouter上输入价格低于0.15美元/百万token的模型里,旧版MiMo在多智能体博弈类游戏中的综合表现是帕累托最优,超过Qwen、Step、gpt-oss等同价位对手,也有人提到MiMo 2.5近期变笨,如今看可能正是团队在为2.6上线做准备。</p>
+        <div class="links"><a href="https://mimo.xiaomi.com/mimo-v2-6" target="_blank" rel="noopener">阅读原文 →</a><a href="https://news.ycombinator.com/item?id=49792730" target="_blank" rel="noopener">讨论区 →</a></div>
+        
+      </article>
+      <article class="story"
+               data-source="hn" data-sid="hn-49788838">
+        <div class="kicker"><span class="n">02</span>
+          <span class="s">Hacker News</span>
+          <span>9月21日</span></div>
+        <h3 class="hl"><a href="https://news.ycombinator.com/item?id=49788838" target="_blank"
+          rel="noopener">Grok 4.7</a></h3>
+        <div class="meta">598 票<span class="sep">·</span>517 评论<span class="sep">·</span>9月21日<span class="sep">·</span>1 天前<span class="sep">·</span>得分 0.973</div>
+        <p class="sum">xAI 发布 Grok 4.7，定位为其编码与知识工作能力最强的模型，官方称速度是上代两倍、价格减半，且与 Grok 4.6 保持同价同速。相比 Grok 4.6，Grok 4.7 用了更大的新基座模型，并在更长的强化学习训练中侧重需要数小时才能完成的高难度任务，自我验证和长上下文管理能力更强，还专门训练以更好地理解 Grok Bot 工具框架。官方给出 CursorBench 4.0、Terminal-Bench 4.0、HealthBench Professional 等多项基准，称在长时编码任务的性价比上处于前沿。HN 评论出现分歧：有人认为 Grok 在 Cursor 里表现优于同类工具，也有人说日常对话体验是几家模型里最差的；还有评论指出 Grok 4.7 参数比 4.6 多约 40% 但价格未涨，且发布比原计划推迟近两周，猜测是团队对效果不够满意，并选在传闻中 Opus 5.5 发布前一天抢发。</p>
+        <div class="links"><a href="https://x.ai/news/grok-4-7" target="_blank" rel="noopener">阅读原文 →</a><a href="https://news.ycombinator.com/item?id=49788838" target="_blank" rel="noopener">讨论区 →</a></div>
+        
+      </article>
+      <article class="story"
+               data-source="hn" data-sid="hn-49794330">
+        <div class="kicker"><span class="n">03</span>
+          <span class="s">Hacker News</span>
+          <span>9月22日</span></div>
+        <h3 class="hl"><a href="https://news.ycombinator.com/item?id=49794330" target="_blank"
+          rel="noopener">I don&#x27;t want to read what you didn&#x27;t write</a></h3>
+        <div class="meta">994 票<span class="sep">·</span>424 评论<span class="sep">·</span>9月22日<span class="sep">·</span>1 天前<span class="sep">·</span>得分 0.967</div>
+        <p class="sum">一篇引发大量共鸣的博客,吐槽AI写作正在制造大量没人真正写、也没人真正想读的文字。作者观察到一种典型模式:人们先用AI造出东西,再用AI把已完成的事回溯性总结成设计文档,这类文档不再是用来建立共识、打磨想法的提案,而是事无巨细却毫无上下文和视角的机器总结,读起来是折磨。同样的问题出现在PR描述、工单和会议纪要里:改了什么写得很细,但读者真正想知道的为什么做、有多紧急、该关注哪里却完全缺席。作者还提到收到过AI润色的私人消息读来疏离生硬,以及有人直接用AI总结自己的评论当作回复这种最偷懒的用法,核心主张是过度依赖AI摘要会消解写作里有风险的真实连接。</p>
+        <div class="links"><a href="https://blog.colinbreck.com/i-dont-want-to-read-what-you-didnt-write/" target="_blank" rel="noopener">阅读原文 →</a><a href="https://news.ycombinator.com/item?id=49794330" target="_blank" rel="noopener">讨论区 →</a></div>
+        
+      </article>
+      <article class="story"
+               data-source="hn" data-sid="hn-49801939">
+        <div class="kicker"><span class="n">04</span>
+          <span class="s">Hacker News</span>
+          <span>9月22日</span></div>
+        <h3 class="hl"><a href="https://news.ycombinator.com/item?id=49801939" target="_blank"
+          rel="noopener">Apple has added persistent &#x27;ads&#x27; to iOS, and it&#x27;s driving users crazy</a></h3>
+        <div class="meta">626 票<span class="sep">·</span>461 评论<span class="sep">·</span>9月22日<span class="sep">·</span>12 小时前<span class="sep">·</span>得分 0.967</div>
+        <p class="sum">TechRadar报道称苹果在iOS设置App里插入了无法轻易关闭的自家产品推广横幅,推销iCloud+存储、Apple Music/Apple TV试用和AppleCare+延保服务,通常出现在购买新设备之后。用户唯一能摆脱这些提示的办法是等它自然过期(可能长达数周甚至数月)或者直接付费购买对应服务,不少情况下连关闭按钮都没有,有的即使有也被反馈点了没反应。社交媒体上大量用户表达不满,将其与Windows开始菜单里的广告相提并论,认为这与苹果一贯标榜的高端体验格格不入。评论区不少开发者补充称App Store搜索结果里插的全屏广告同样泛滥且经常和搜索内容毫不相关,小开发者与砸钱买量的大公司竞争时更加吃亏。</p>
+        <div class="links"><a href="https://www.techradar.com/phones/iphone/i-wish-apple-would-just-stop-that-crap-apple-has-added-persistent-ads-to-ios-and-its-driving-users-crazy" target="_blank" rel="noopener">阅读原文 →</a><a href="https://news.ycombinator.com/item?id=49801939" target="_blank" rel="noopener">讨论区 →</a></div>
+        
+      </article>
+      <article class="story"
+               data-source="hn" data-sid="hn-49776729">
+        <div class="kicker"><span class="n">05</span>
+          <span class="s">Hacker News</span>
+          <span>9月20日</span></div>
+        <h3 class="hl"><a href="https://news.ycombinator.com/item?id=49776729" target="_blank"
+          rel="noopener">ChatGPT now knows what you do on other websites via ad collector</a></h3>
+        <div class="meta">758 票<span class="sep">·</span>393 评论<span class="sep">·</span>9月20日<span class="sep">·</span>2 天前<span class="sep">·</span>得分 0.961</div>
+        <p class="sum">独立研究者 buchodi 逆向了 OpenAI 广告平台（内部代号 bazaar）的追踪机制：ChatGPT 客户端生成随机标识并向后端换取 60 秒有效的 RS256 JWT，再跨站 POST 到 bzr.openai.com，写入作用域为 .openai.com、有效期一年的 __obi cookie，与 ChatGPT 账号绑定。购买 ChatGPT 广告的商家在自家网站嵌入 OpenAI 代码后，会把 __obi 连同浏览的商品、文章和购买行为一并回传，OpenAI 因此能把站外行为关联到账号。作者称在手机上用两种独立抓包方式复现，并核对了 936 个广告像素、1029 个主机名的数月流量。HN 讨论里有人说这就是 Meta、Google 用了多年的标准广告技术，也有人指出早在 4 月就有报道，争议点在于把它放到 AI 聊天产品上的隐私含义。</p>
+        <div class="links"><a href="https://www.buchodi.com/chatgpt-now-knows-what-you-do-on-other-websites-via-ad-collector/" target="_blank" rel="noopener">阅读原文 →</a><a href="https://news.ycombinator.com/item?id=49776729" target="_blank" rel="noopener">讨论区 →</a></div>
+        
+      </article></div>
+    </section>
+  <footer><h4>编者按 · Editor&rsquo;s Note</h4><p>本期排名只使用各平台<strong>原生公开的真实计数</strong>：评论量（权重 0.5）、转发量（0.3，仅 Reddit 公开）、点赞或票数（0.2）。某信源缺某项指标时，其权重按比例分配给该信源可得的指标。「点击率」在四个信源中全部不公开，因此不参与排名，也不出现在本页任何数字中。</p><p>各指标先在<strong>同信源同窗口</strong>的候选池内换算成分位值（0~1）再加权求和。用分位而非极值归一，是因为互动数据呈重尾分布，极值归一会被单个爆款压平中段。得分只在同信源内可比，因此版块内先按信源优先级排列，再按组内得分降序 —— 不做跨平台的分数比较。</p><p>名额固定：七日要闻 HN 4 / Reddit 3 / HF 2 / dev.to 1，三日速览 2/1/1/1，另设 Hacker News 专属三日专栏 5 条。某信源不足额时，空缺按 HN → Reddit → HF → dev.to <strong>轮流各补一席</strong>，而非让最高优先级的一家吃满 —— 否则某个信源缺席时版面会被单一平台压倒。三个版块之间不重复选取同一条目。</p><p>本期实际补位：<strong>七日要闻</strong> hn +1、hf +1、devto +1；<strong>三日速览</strong> hn +1。</p><p>数据来源：<strong>Hacker News</strong>：points&gt;20 的 story；<strong>Hugging Face Papers</strong>：3 天无日报(周末/尚未发布)；<strong>DEV Community</strong>：全站热榜 top=7 + top=3。</p><p><span class="note-warn">本期未采集：<strong>r/LocalLLaMA</strong>（未配置 REDDIT_CLIENT_ID / REDDIT_CLIENT_SECRET）。其名额已轮转分给其余信源，页面中不含该信源的任何条目。</span></p><p>报头下的频道条可按信源筛选，序号与头条随所选频道重排；链接末尾的 <code>#ch=hn</code> 之类可直接落到指定频道。禁用 JavaScript 时频道条隐藏，全部条目照常显示。</p><p>生成时间 2026-09-23T10:18:33+08:00　·　HN 候选门槛 <code>points &gt; 20</code>　·　排名口径全文见 <code>references/ranking.md</code></p></footer>
+</div>
+<noscript><style>.channels{display:none}</style></noscript>
+<script>
+(function(){
+  var body=document.body, btns=[].slice.call(document.querySelectorAll('.ch'));
+  function cols(grid){
+    var t=getComputedStyle(grid).gridTemplateColumns;
+    return t ? t.split(' ').filter(Boolean).length : 1;
+  }
+  var cur='all';
+  function apply(ch){
+    cur=ch; body.setAttribute('data-ch', ch);
+    btns.forEach(function(b){b.classList.toggle('on', b.dataset.ch===ch)});
+    [].forEach.call(document.querySelectorAll('section[data-sec]'), function(s){
+      var grid=s.querySelector('.grid'), all=grid?[].slice.call(
+        grid.querySelectorAll('.story')):[];
+      var vis=all.filter(function(a){
+        return ch==='all' || a.getAttribute('data-source')===ch;});
+      s.hidden = vis.length===0;                       // 空版块整块收起，不留空壳标题
+      all.forEach(function(a){a.classList.remove('is-lead');a.removeAttribute('data-col')});
+      if(!vis.length) return;                          // 先清干净再返回，不留陈旧状态
+      var n=cols(grid);
+      vis.forEach(function(a,i){
+        // 序号与头条都跟着当前视图走；列位自己算，nth-child 在过滤后会错位
+        a.querySelector('.kicker .n').textContent=('0'+(i+1)).slice(-2);
+        if(i===0){a.classList.add('is-lead');return;}
+        var c=(i-1)%n;
+        a.setAttribute('data-col', c===0 ? '0' : (c===n-1 ? 'last' : String(c)));
+      });
+    });
+    try{history.replaceState(null,'','#ch='+ch)}catch(e){}
+  }
+  btns.forEach(function(b){
+    if(!b.disabled) b.addEventListener('click', function(){apply(b.dataset.ch)});
+  });
+  var t;
+  addEventListener('resize', function(){       // 断点变化会改列数，重排列位
+    clearTimeout(t); t=setTimeout(function(){apply(cur)}, 150);
+  });
+  var m=/[#&]ch=([a-z]+)/i.exec(location.hash), want=m && m[1].toLowerCase();
+  apply(want && document.querySelector('.ch[data-ch="'+want+'"]:not(:disabled)')
+        ? want : 'all');
+})();
+</script>
+</body>
+</html>
