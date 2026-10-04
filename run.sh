@@ -3,7 +3,7 @@
 #
 #   ./run.sh              等同 all
 #   ./run.sh fetch        只取数（日报 + 新闻板），产出 .work/*.json
-#   ./run.sh summarize    用本地 llama-server 给缺摘要的条目写中文摘要
+#   ./run.sh summarize    用本地 llama-server 给缺摘要的条目写中文摘要，写完自动 render
 #   ./run.sh render       只渲染，把结果写到 index.html / digest.html
 #   ./run.sh all          fetch + summarize（本地模型在线时）+ render
 #   ./run.sh status       统计当前数据里有多少条已有摘要、多少条待补
@@ -13,6 +13,7 @@
 #   --hn-min-points N     HN 候选门槛，默认 20
 #   --no-content          跳过正文抓取，只验证排名链路
 #   --limit N             summarize 最多写 N 条（试跑用）
+#   --redo-all            summarize 用本地模型重写全部条目（已由本地模型写过的跳过，可续跑）
 #
 # 摘要：已有摘要会从已发布页面恢复并合并进 .work/summaries.json，永不覆盖。
 # 缺的由 summarize 交给本地模型写（需先手动启动 llama-server，地址可用环境变量
@@ -30,12 +31,13 @@ SUMMARIES="$WORK/summaries.json"
 
 cmd="${1:-all}"
 [[ $# -gt 0 ]] && shift
-[[ "$cmd" == -h || "$cmd" == --help ]] && { sed -n '2,21p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'; exit 0; }
+[[ "$cmd" == -h || "$cmd" == --help ]] && { sed -n '2,22p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'; exit 0; }
 
 REDDIT_JSON=""
 HN_MIN=20
 NO_CONTENT=0
 LIMIT=0
+REDO_ALL=0
 LLAMA_SERVER="${LLAMA_SERVER:-http://127.0.0.1:8080}"
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -43,7 +45,8 @@ while [[ $# -gt 0 ]]; do
     --hn-min-points) HN_MIN="${2:?--hn-min-points 需要数字}"; shift 2 ;;
     --no-content)    NO_CONTENT=1; shift ;;
     --limit)         LIMIT="${2:?--limit 需要数字}"; shift 2 ;;
-    -h|--help)       sed -n '2,21p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'; exit 0 ;;
+    --redo-all)      REDO_ALL=1; shift ;;
+    -h|--help)       sed -n '2,22p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'; exit 0 ;;
     *) echo "未知选项: $1" >&2; exit 2 ;;
   esac
 done
@@ -109,10 +112,14 @@ do_fetch() {
 server_up() { curl -sf -m 5 "$LLAMA_SERVER/health" >/dev/null 2>&1; }
 
 do_summarize() {
-  [[ -f "$WORK/digest_data.json" ]] || { echo "缺 $WORK/digest_data.json，请先 ./run.sh fetch" >&2; exit 1; }
+  for f in digest_data.json board_data.json; do
+    [[ -f "$WORK/$f" ]] || { echo "缺 $WORK/$f，请先 ./run.sh fetch" >&2; exit 1; }
+  done
   recover_summaries                     # 先恢复已发布的摘要，避免重写
   log "本地模型写摘要 (summarize_local.py → $LLAMA_SERVER)"
-  python3 "$SCRIPTS/summarize_local.py" --work "$WORK" --server "$LLAMA_SERVER" --limit "$LIMIT"
+  args=(--work "$WORK" --server "$LLAMA_SERVER" --limit "$LIMIT")
+  [[ "$REDO_ALL" == 1 ]] && args+=(--redo-all)
+  python3 "$SCRIPTS/summarize_local.py" "${args[@]}"
 }
 
 do_render() {
@@ -161,7 +168,7 @@ PY
 
 case "$cmd" in
   fetch)  do_fetch ;;
-  summarize) do_summarize ;;
+  summarize) do_summarize; do_render ;;
   render) do_render ;;
   all)    do_fetch
           if server_up; then do_summarize

@@ -104,18 +104,19 @@
 
 ## 本地模型写摘要（可选）
 
-不开 Claude 也能补摘要：`scripts/summarize_local.py` 调用本地 llama.cpp 的 `llama-server`（OpenAI 兼容接口），只补 `summaries.json` 里缺的条目，**已有摘要永不覆盖**。写作规范与 `SKILL.md` 第二段一致；输出不合格（非中文、过短过长、复述标题、空话）会带着原因重试一次，仍不合格就跳过，页面照常标「摘要待补」。本地模型写的条目记在 `.work/summaries_meta.json`，便于日后抽查或让 Claude 重写。
+不开 Claude 也能补摘要：`scripts/summarize_local.py` 调用本地 llama.cpp 的 `llama-server`（OpenAI 兼容接口），默认只补 `summaries.json` 里缺的条目，**已有摘要不覆盖**（要整体换成本地模型的版本用 `--redo-all`）。写作规范与 `SKILL.md` 第二段一致；输出不合格（非中文、过短过长、复述标题、空话）会带着原因重试一次，仍不合格就跳过：原来有摘要的保留原文，没有的页面照常标「摘要待补」。本地模型写的条目记在 `.work/summaries_meta.json`，便于日后抽查或让 Claude 重写。
 
 ```bash
 brew install llama.cpp
 llama-server -hf inclusionAI/Ling-3.0-tiny-GGUF:Q6_K \
   -ngl 99 -c 16384 -np 1 -fa on --jinja --reasoning-budget 0 --port 8080   # 另开终端常驻
 
-./run.sh summarize --limit 3   # 试跑三条
+./run.sh summarize --limit 3   # 试跑三条（写完自动渲染 index.html / digest.html）
+./run.sh summarize --redo-all  # 全部条目（日报 20 + 新闻板约 440）用本地模型重写
 ./run.sh all                   # 模型在线时 = 取数 + 写摘要 + 渲染；不在线则跳过写摘要
 ```
 
-新闻板只有前 `--enrich-batches`（默认 2）批抓了正文，第 3 批起没有正文可依据，不会被补写。
+新闻板只有前 `--enrich-batches`（默认 2）批在取数时抓了正文；第 3 批起的条目由 summarize 现场补抓正文再写，抓不到就按标题注明「正文未能获取」。全量几百条耗时较长，可配合 `--limit` 分批跑；`--redo-all` 会跳过 `summaries_meta.json` 里已由本地模型写过的条目，中断后重跑即可续上。
 
 ## 前置条件
 

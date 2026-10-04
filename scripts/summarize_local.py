@@ -6,7 +6,7 @@ summarize_local.py — 用本地 llama-server 为缺摘要的条目写 200 字�
     python3 summarize_local.py --work .work --dry-run --limit 2   # 只看提示词
 
 读 digest_data.json（日报）与 board_content.json（新闻板前几批的正文），
-只补 summaries.json 里还没有的 sid —— 已有摘要一律不覆盖（--redo 显式指定的除外）。
+只补 summaries.json 里还没有的 sid —— 已有摘要不覆盖（--redo / --redo-all 除外）。
 写作规范与 SKILL.md 第二段一致。校验不过的条目跳过，页面照常标「摘要待补」，
 绝不塞低质量文本。哪些摘要出自本地模型记在 summaries_meta.json。
 
@@ -76,6 +76,14 @@ def collect_items(work, only):
             if sid not in seen:
                 seen.add(sid)
                 out.append((sid, it))
+        # 前几批之外没抓正文的条目：标 needs_webfetch，build_prompt 会现场补抓
+        d = load_json(os.path.join(work, "board_data.json"), {})
+        for bt in d.get("batches", []):
+            for it in bt.get("items", []):
+                if it["sid"] not in seen:
+                    seen.add(it["sid"])
+                    out.append((it["sid"], {**it, "needs_webfetch": True,
+                                            "content": "", "discussion": ""}))
     return out
 
 
@@ -159,6 +167,8 @@ def main():
     ap.add_argument("--limit", type=int, default=0, help="最多写 N 条，0 = 不限")
     ap.add_argument("--redo", action="append", default=[], metavar="SID",
                     help="强制重写该条（可多次指定）")
+    ap.add_argument("--redo-all", action="store_true",
+                    help="用本地模型重写当前数据里的全部条目（已由本地模型写过的跳过，可断点续跑）")
     ap.add_argument("--content-limit", type=int, default=DEFAULT_LIMIT)
     ap.add_argument("--temperature", type=float, default=0.3)
     ap.add_argument("--max-tokens", type=int, default=700)
@@ -172,11 +182,15 @@ def main():
     meta = load_json(mpath, {})
     redo = set(args.redo)
 
+    def has(sid):
+        return bool((summaries.get(sid) or "").strip())
+
     todo = [(sid, it) for sid, it in collect_items(args.work, args.only)
-            if sid in redo or not (summaries.get(sid) or "").strip()]
+            if sid in redo or not has(sid) or (args.redo_all and sid not in meta)]
     if args.limit:
         todo = todo[:args.limit]
-    log(f"待写摘要 {len(todo)} 条（已有 {len(summaries)} 条不动）")
+    n_redo = sum(1 for sid, _ in todo if has(sid))
+    log(f"待写摘要 {len(todo)} 条（重写 {n_redo} / 新补 {len(todo) - n_redo}）")
     if not todo:
         return
     if not args.dry_run and not server_ok(args.server):
@@ -220,7 +234,8 @@ def main():
         return
     log(f"完成：写入 {done} 条，跳过 {len(skipped)} 条，用时 {time.time() - t0:.0f}s")
     for sid, why in skipped:
-        log(f"  跳过 {sid}：{why}（页面上将标「摘要待补」）")
+        tail = "保留原摘要" if has(sid) else "页面上将标「摘要待补」"
+        log(f"  跳过 {sid}：{why}（{tail}）")
 
 
 if __name__ == "__main__":
