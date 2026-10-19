@@ -235,7 +235,9 @@ JS = r"""
     a.appendChild(star);
 
     var body = el('div','body');
-    body.appendChild(el('div','kicker', it.source_label + ' · ' + cnDate(it.created_utc)));
+    body.appendChild(el('div','kicker', it.source_label + ' · ' + cnDate(it.created_utc) +
+      (it.lingering_signal ? ' · 🔥 持续热门 · ' + it.lingering_signal :
+       (it.age_bucket === 'lingering' ? ' · 近两周高热' : ''))));
 
     var h = el('h3','hl'), link = el('a', null, it.title);
     link.href = it.permalink; link.target='_blank'; link.rel='noopener';
@@ -401,7 +403,13 @@ def render_footer(data, summaries):
         f"{cfg['hn_per_batch']} 条 + Hugging Face Papers {cfg['hf_per_batch']} 条。"
         f"点「更新」往下翻一批，往回翻也随时可以 —— 所有批次都在这一页里，不会消失。"
         f"批次数受 <code>{esc(cfg.get('batch_limited_by', '?'))}</code> 的候选量限制"
-        f"（本期候选池 HN {data['pool']['hn']} 条 / HF {data['pool']['hf']} 篇）。",
+        f"（本期候选池 HN {data['pool']['hn']['fresh']}+{data['pool']['hn']['lingering']} 条 / "
+        f"HF {data['pool']['hf']['fresh']}+{data['pool']['hf']['lingering']} 篇，"
+        f"前者为三日内、后者为 4–{cfg.get('linger_days', 14)} 天）。"
+        + (f"每批约 {round(100 * (1 - cfg.get('linger_share', 0.3)))}% 为三日内新内容，"
+           f"约 {round(100 * cfg.get('linger_share', 0.3))}% 为 4–{cfg.get('linger_days', 14)} 天内"
+           + ("编辑从高讨论量帖子中精选的技术长帖（标 🔥 编辑精选）。" if cfg.get("curated")
+              else "仍在榜的持续热门（标 🔥）。")),
 
         "排名只使用平台原生公开计数：评论量（权重 0.5）与票数／upvotes（0.2），"
         "缺失指标的权重按比例分配给该信源可得的指标。各指标先在<strong>同信源同窗口</strong>"

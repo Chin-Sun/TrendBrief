@@ -5,7 +5,7 @@ description: 从 Hacker News、r/LocalLLaMA、Hugging Face Papers、dev.to 四�
 
 # 技术热帖简报
 
-产出一份 20 条的 HTML 简报：七日要闻 Top10 + 三日速览 Top5 + Hacker News 专属三日 Top5。
+产出一份 20 条的 HTML 简报：三日新闻 14 条 + 持续热门（4–14 天仍在榜）6 条，约 70/30。
 
 ## 工作流：三段式
 

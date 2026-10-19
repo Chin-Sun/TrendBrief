@@ -51,16 +51,17 @@ AVAILABLE_METRICS = {
 }
 
 SECTIONS = [
-    {"id": "d7",  "window": 7, "title": "七日要闻",
-     "kicker": "PAST 7 DAYS · TOP 10",
-     "quota": {"hn": 4, "reddit": 3, "hf": 2, "devto": 1}},
-    {"id": "d3",  "window": 3, "title": "三日速览",
-     "kicker": "PAST 3 DAYS · TOP 5",
-     "quota": {"hn": 2, "reddit": 1, "hf": 1, "devto": 1}},
-    {"id": "hn3", "window": 3, "title": "Hacker News 专栏",
-     "kicker": "HACKER NEWS · PAST 3 DAYS · TOP 5",
-     "quota": {"hn": 5}},
+    {"id": "d3",  "window": 3, "title": "三日新闻",
+     "kicker": "PAST 3 DAYS · TOP 14", "pool": "fresh",
+     "quota": {"hn": 6, "reddit": 3, "hf": 3, "devto": 2}},
+    {"id": "hot", "window": 14, "title": "持续热门",
+     "kicker": "LINGERING · 4–14 DAYS · STILL TRENDING · TOP 6", "pool": "lingering",
+     "quota": {"hn": 3, "reddit": 1, "hf": 1, "devto": 1}},
 ]
+
+FRESH_DAYS = 3          # <=3 天算「新发生」
+LINGER_DAYS = 14        # 4–14 天内仍在榜的算「持续热门」
+LINGER_MIN_SCORE = 0.7  # Reddit / dev.to 无「当前首页」接口，用 14 天池内分位 >= 此值代替
 
 MIN_TEXT = 400          # 正文低于此长度视为抓取不足，交给 WebFetch 补
 DEFAULT_LIMIT = 3000    # 单条正文截断长度
@@ -254,6 +255,18 @@ def fetch_hn(since_ts, min_points):
                    "note": f"points>{min_points} 的 story"}
 
 
+def fetch_hn_front():
+    """HN 当前首页的 story id 集合 —— 「仍在讨论区前排」的原生信号。"""
+    try:
+        data = http_json("https://hn.algolia.com/api/v1/search?tags=front_page&hitsPerPage=100")
+    except Exception as e:                           # noqa: BLE001
+        log(f"HN      首页抓取失败: {type(e).__name__}")
+        return set()
+    ids = {str(h.get("objectID")) for h in data.get("hits") or []}
+    log(f"HN      当前首页 {len(ids)} 条")
+    return ids
+
+
 # ---------------------------------------------------------------- 适配器：Reddit
 
 def load_env_file(path):
@@ -412,7 +425,7 @@ def _hf_item(entry):
     )
 
 
-def fetch_hf(days=8):
+def fetch_hf(days=LINGER_DAYS + 1):
     """trending 是历史热门榜（实测 50 条中仅 8 条在 7 天内、0 条在 3 天内），
     因此必须用 daily_papers 逐日补齐。daily_papers 周末不发布，空日属正常。"""
     entries, notes = {}, []
@@ -429,6 +442,7 @@ def fetch_hf(days=8):
                 for e in obj["dailyPapers"]:
                     it = _hf_item(e)
                     if it:
+                        it["extra"]["trending"] = True
                         entries[it["extra"]["paper_id"]] = it
                 break
     except Exception as e:                           # noqa: BLE001
@@ -465,7 +479,7 @@ def fetch_hf(days=8):
 def fetch_devto():
     items, seen = {}, set()
     errs = []
-    for top in (7, 3):                # top=N 的语义正是『近 N 天热榜』
+    for top in (14, 7, 3):                # top=N 的语义正是『近 N 天热榜』
         try:
             arr = http_json(f"https://dev.to/api/articles?top={top}&per_page=100", retries=1)
         except Exception as e:                       # noqa: BLE001
@@ -496,7 +510,7 @@ def fetch_devto():
             )
     out = list(items.values())
     log(f"dev.to  候选 {len(out)} 条")
-    status = {"ok": bool(out), "candidates": len(out), "note": "全站热榜 top=7 + top=3"}
+    status = {"ok": bool(out), "candidates": len(out), "note": "全站热榜 top=14 + top=7 + top=3"}
     if errs:
         status["note"] += "；" + "，".join(errs)
     if not out:
@@ -756,12 +770,12 @@ def main():
     args = ap.parse_args()
 
     now = int(time.time())
-    since = {7: now - 7 * 86400, 3: now - 3 * 86400}
+    since = {w: now - w * 86400 for w in (LINGER_DAYS, FRESH_DAYS)}
 
     print("▸ 采集候选池", file=sys.stderr)
     load_env_file(args.reddit_env)
     raw, status = {}, {}
-    raw["hn"], status["hn"] = fetch_hn(since[7], args.hn_min_points)
+    raw["hn"], status["hn"] = fetch_hn(since[LINGER_DAYS], args.hn_min_points)
     raw["reddit"], status["reddit"] = fetch_reddit(args.reddit_json)
     raw["hf"], status["hf"] = fetch_hf()
     raw["devto"], status["devto"] = fetch_devto()
@@ -775,9 +789,11 @@ def main():
         it["key"] = f"{it['source']}:{norm_url(it['permalink']) or it['title'][:60]}"
         assign_sid(it)
 
-    # 分窗口 · 分信源打分
+    # 分窗口 · 分信源打分。fresh = 3 天内；lingering = 4–14 天内且仍在榜：
+    #   HN 在当前首页 / HF 在 trending 榜 / Reddit、dev.to 在 14 天池内分位 >= LINGER_MIN_SCORE
+    front = fetch_hn_front()
     pools = {}
-    for win in (7, 3):
+    for win in (FRESH_DAYS, LINGER_DAYS):
         pools[win] = {}
         for src in SOURCE_ORDER:
             sel = [dict(it) for it in flat
@@ -785,15 +801,35 @@ def main():
             score_pool(sel)
             sel.sort(key=lambda x: -x["score"])
             pools[win][src] = sel
-        log(f"{win} 天窗口池: " + ", ".join(
-            f"{s}={len(pools[win][s])}" for s in SOURCE_ORDER))
+    fresh_pool, linger_pool = pools[FRESH_DAYS], {}
+    for src in SOURCE_ORDER:
+        keep = []
+        for it in pools[LINGER_DAYS][src]:
+            if it["created_utc"] >= since[FRESH_DAYS]:
+                continue
+            sig = None
+            if src == "hn" and it["extra"].get("hn_id") in front:
+                sig = "HN 首页在榜"
+            elif src == "hf" and it["extra"].get("trending"):
+                sig = "HF trending 在榜"
+            elif it["score"] >= LINGER_MIN_SCORE:   # 首页 / trending 之外的兜底：14 天池内仍居前列
+                sig = "14 天热榜前列"
+            if sig:
+                it["age_bucket"], it["lingering_signal"] = "lingering", sig
+                keep.append(it)
+        linger_pool[src] = keep
+    for it in (i for s_ in fresh_pool.values() for i in s_):
+        it["age_bucket"] = "fresh"
+    by_pool = {"fresh": fresh_pool, "lingering": linger_pool}
+    for name, pl in by_pool.items():
+        log(f"{name} 池: " + ", ".join(f"{s}={len(pl[s])}" for s in SOURCE_ORDER))
 
     # 按版块分配名额
     used, sections = set(), []
     for spec in SECTIONS:
-        chosen, shortfall, backfill = select(pools[spec["window"]], spec["quota"],
+        chosen, shortfall, backfill = select(by_pool[spec["pool"]], spec["quota"],
                                              used, args.allow_cross_section_dupes)
-        sections.append({**{k: spec[k] for k in ("id", "title", "kicker", "quota", "window")},
+        sections.append({**{k: spec[k] for k in ("id", "title", "kicker", "quota", "window", "pool")},
                          "shortfall": shortfall, "backfill": backfill, "items": chosen})
         got = {}
         for it in chosen:
@@ -826,7 +862,7 @@ def main():
         "windows": {f"d{w}": {"since_utc": since[w],
                               "since_iso": datetime.fromtimestamp(
                                   since[w], timezone.utc).isoformat().replace("+00:00", "Z")}
-                    for w in (7, 3)},
+                    for w in (LINGER_DAYS, FRESH_DAYS)},
         "source_status": {s: {**status[s], "label": SOURCE_LABEL[s],
                               "home": SOURCE_HOME[s], "priority": i + 1}
                           for i, s in enumerate(SOURCE_ORDER)},

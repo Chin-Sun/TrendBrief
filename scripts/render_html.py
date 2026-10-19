@@ -218,13 +218,18 @@ def render_item(it, idx, summaries, now, lead=False):
         link_html = (f'<a href="{esc(it["target_url"])}" target="_blank" rel="noopener">'
                      f'阅读原文 →</a>' + link_html)
 
+    linger = ""
+    if it.get("age_bucket") == "lingering":
+        linger = (f'<span class="s" title="发布于 4–14 天前，当前仍在榜">'
+                  f'🔥 持续热门 · {esc(it.get("lingering_signal", ""))}</span>')
+
     # 头条与常规条目共用一套结构 —— 频道过滤后头条要能换人，两套 HTML 做不到
     return f"""
       <article class="story{' is-lead' if lead else ''}"
                data-source="{esc(it['source'])}" data-sid="{esc(sid)}">
         <div class="kicker"><span class="n">{idx:02d}</span>
           <span class="s">{esc(it['source_label'])}</span>
-          <span>{esc(cn_date(it['created_utc']))}</span></div>
+          <span>{esc(cn_date(it['created_utc']))}</span>{linger}</div>
         <h3 class="hl"><a href="{esc(it['permalink'])}" target="_blank"
           rel="noopener">{esc(it['title'])}</a></h3>
         <div class="meta">{meta_line(it, now)}</div>
@@ -357,11 +362,13 @@ def render_footer(data, summaries, missing):
         "用分位而非极值归一，是因为互动数据呈重尾分布，极值归一会被单个爆款压平中段。"
         "得分只在同信源内可比，因此版块内先按信源优先级排列，再按组内得分降序 —— "
         "不做跨平台的分数比较。",
-        "名额固定：七日要闻 HN 4 / Reddit 3 / HF 2 / dev.to 1，三日速览 2/1/1/1，"
-        "另设 Hacker News 专属三日专栏 5 条。某信源不足额时，空缺按 "
+        "配比约 70% / 30%：三日新闻 14 条（HN 6 / Reddit 3 / HF 3 / dev.to 2），"
+        "持续热门 6 条（HN 3 / Reddit 1 / HF 1 / dev.to 1）。持续热门指发布于 4–14 天前、"
+        "但此刻仍在榜的条目：HN 看当前首页，HF 看 trending 榜，Reddit 与 dev.to 无首页接口，"
+        "取 14 天池内分位 ≥ 0.7。某信源不足额时，空缺按 "
         "HN → Reddit → HF → dev.to <strong>轮流各补一席</strong>，"
         "而非让最高优先级的一家吃满 —— 否则某个信源缺席时版面会被单一平台压倒。"
-        "三个版块之间不重复选取同一条目。",
+        "两个版块之间不重复选取同一条目。",
     ]
 
     bf = [(s["title"], s["backfill"]) for s in data["sections"] if s.get("backfill")]
