@@ -211,6 +211,7 @@ def render_item(it, idx, summaries, now, lead=False):
         links = " · ".join(f'<a href="{esc(l["url"])}">{esc(l["label"])}</a>'
                            for l in it["also_links"])
         also = f'<div class="also">另见 {links}</div>'
+    also_line = f"\n        {also}" if also else ""
 
     same = it["target_url"] == it["permalink"]
     link_html = f'<a href="{esc(it["permalink"])}" target="_blank" rel="noopener">讨论区 →</a>'
@@ -234,8 +235,7 @@ def render_item(it, idx, summaries, now, lead=False):
           rel="noopener">{esc(it['title'])}</a></h3>
         <div class="meta">{meta_line(it, now)}</div>
         {sum_html}
-        <div class="links">{link_html}</div>
-        {also}
+        <div class="links">{link_html}</div>{also_line}
       </article>"""
 
 

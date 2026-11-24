@@ -117,12 +117,17 @@ def dump_candidates(pools, path, top=80):
 
 def cut_batches(pools, per, max_batches, linger_share=0.3):
     """第 k 批 = 各信源 fresh 池与 lingering 池各自的第 k 段，约 70/30 合并。
-    只保留两边都凑得满的批次。"""
+    只保留两边都凑得满的批次。若某信源 fresh 池为空（如周末无 HF 论文），自动降级为全 lingering。"""
     n_old = {s: round(per[s] * linger_share) for s in pools}
     n_new = {s: per[s] - n_old[s] for s in pools}
-    counts = {s: min(len(pools[s]["fresh"]) // n_new[s],
-                     len(pools[s]["lingering"]) // max(n_old[s], 1)) for s in pools}
-    n = min(counts.values())
+    for s in pools:
+        if n_new[s] > 0 and len(pools[s]["fresh"]) < n_new[s]:
+            n_old[s], n_new[s] = per[s], 0
+    counts = {}
+    for s in pools:
+        fresh_cap = len(pools[s]["fresh"]) // n_new[s] if n_new[s] else float("inf")
+        counts[s] = min(fresh_cap, len(pools[s]["lingering"]) // max(n_old[s], 1))
+    n = int(min(counts.values()))
     if max_batches:
         n = min(n, max_batches)
     batches = []
